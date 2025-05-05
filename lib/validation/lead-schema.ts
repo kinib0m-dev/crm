@@ -1,54 +1,38 @@
 import { z } from "zod";
-import { leadStatusEnum, timeframeEnum } from "@/db/schema";
 
-// Create a type-safe lead status array from the enum
-const leadStatusArray = leadStatusEnum.enumValues;
-type LeadStatus = (typeof leadStatusArray)[number];
-
-// Create a type-safe timeframe array from the enum
-const timeframeArray = timeframeEnum.enumValues;
-type Timeframe = (typeof timeframeArray)[number];
-
-// Base schema with common fields for both create and update operations
-const leadBaseSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  email: z.string().email({ message: "Invalid email address" }).optional(),
+export const createLeadSchema = z.object({
+  name: z.string(),
+  email: z.string().email().optional(),
   phone: z.string().optional(),
-  status: z
-    .enum(leadStatusArray as [LeadStatus, ...LeadStatus[]])
-    .default("new_lead"),
+  status: z.enum([
+    "new_lead",
+    "initial_contact",
+    "awaiting_response",
+    "engaged",
+    "information_gathering",
+    "high_interest",
+    "qualified",
+    "appointment_scheduled",
+    "proposal_sent",
+    "negotiation",
+    "converted",
+    "purchased_elsewhere",
+    "future_opportunity",
+    "periodic_nurture",
+    "reactivated",
+    "unsubscribed",
+    "invalid",
+  ]),
   sourceId: z.string().uuid().optional(),
-  priority: z.number().int().min(1).max(5).default(3),
+  priority: z.number().int().min(1).max(5).optional(),
+  qualificationScore: z.number().int().optional(),
+  lastContactedAt: z.coerce.date().optional(),
+  nextFollowUpDate: z.coerce.date().optional(),
   expectedPurchaseTimeframe: z
-    .enum(timeframeArray as [Timeframe, ...Timeframe[]])
+    .enum(["immediate", "1-3 months", "3-6 months", "6+ months"])
     .optional(),
   budget: z.string().optional(),
+  isDeleted: z.boolean().optional(),
 });
 
-// Schema for creating a new lead
-export const createLeadSchema = leadBaseSchema;
-
-// Schema for updating an existing lead
-export const updateLeadSchema = leadBaseSchema.partial().extend({
-  id: z.string().uuid(),
-});
-
-// Schema for filtering leads
-export const leadFilterSchema = z.object({
-  status: z.enum(leadStatusArray as [LeadStatus, ...LeadStatus[]]).optional(),
-  priority: z.number().int().min(1).max(5).optional(),
-  sourceId: z.string().uuid().optional(),
-  search: z.string().optional(),
-  timeframe: z.enum(timeframeArray as [Timeframe, ...Timeframe[]]).optional(),
-  page: z.number().int().min(1).default(1),
-  limit: z.number().int().min(1).max(100).default(10),
-  sortBy: z
-    .enum(["name", "createdAt", "status", "priority"])
-    .default("createdAt"),
-  sortDirection: z.enum(["asc", "desc"]).default("desc"),
-});
-
-// Types for our schemas
-export type CreateLeadInput = z.infer<typeof createLeadSchema>;
-export type UpdateLeadInput = z.infer<typeof updateLeadSchema>;
-export type LeadFilterInput = z.infer<typeof leadFilterSchema>;
+export type CreateLeadSchema = z.infer<typeof createLeadSchema>;

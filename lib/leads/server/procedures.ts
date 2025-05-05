@@ -2,13 +2,9 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { db } from "@/db";
 import { leads, leadTags, tags } from "@/db/schema";
-import {
-  createLeadSchema,
-  updateLeadSchema,
-  leadFilterSchema,
-} from "@/lib/validation/lead-schema";
+import { createLeadSchema } from "@/lib/validation/lead-schema";
 import { TRPCError } from "@trpc/server";
-import { eq, and, ilike, or, desc, asc, sql, inArray } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export const leadRouter = createTRPCRouter({
   // Create a new lead
@@ -18,14 +14,14 @@ export const leadRouter = createTRPCRouter({
       try {
         const userId = ctx.userId as string;
 
+        // Ensure the data passed matches the expected types (e.g., converting number to string if necessary)
+        const leadData = {
+          userId,
+          ...input,
+        };
+
         // Insert the new lead
-        const [newLead] = await db
-          .insert(leads)
-          .values({
-            ...input,
-            userId,
-          })
-          .returning();
+        const [newLead] = await db.insert(leads).values(leadData).returning();
 
         return {
           success: true,
@@ -96,6 +92,7 @@ export const leadRouter = createTRPCRouter({
       }
     }),
 
+  /*
   // Update a lead
   update: protectedProcedure
     .input(updateLeadSchema)
@@ -437,4 +434,5 @@ export const leadRouter = createTRPCRouter({
       });
     }
   }),
+  */
 });

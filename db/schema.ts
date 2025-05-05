@@ -7,7 +7,6 @@ import {
   uuid,
   boolean,
   pgEnum,
-  decimal,
   jsonb,
   date,
 } from "drizzle-orm/pg-core";
@@ -315,7 +314,7 @@ export const leads = pgTable("leads", {
   lastContactedAt: timestamp("last_contacted_at", { mode: "date" }),
   nextFollowUpDate: timestamp("next_follow_up_date", { mode: "date" }),
   expectedPurchaseTimeframe: timeframeEnum("expected_purchase_timeframe"),
-  budget: decimal("budget", { precision: 10, scale: 2 }),
+  budget: text("budget"),
   isDeleted: boolean("is_deleted").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
