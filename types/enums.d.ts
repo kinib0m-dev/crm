@@ -1,0 +1,68 @@
+type LeadStatus =
+  | "new_lead"
+  | "initial_contact"
+  | "awaiting_response"
+  | "engaged"
+  | "information_gathering"
+  | "high_interest"
+  | "qualified"
+  | "appointment_scheduled"
+  | "proposal_sent"
+  | "negotiation"
+  | "converted"
+  | "purchased_elsewhere"
+  | "future_opportunity"
+  | "periodic_nurture"
+  | "reactivated"
+  | "unsubscribed"
+  | "invalid";
+
+type InteractionType =
+  | "email"
+  | "whatsapp"
+  | "call"
+  | "meeting"
+  | "note"
+  | "task"
+  | "other";
+
+type InteractionDirection = "inbound" | "outbound";
+
+type InteractionChannel = "manual" | "automated" | "scheduled";
+
+type MessageDirection = "inbound" | "outbound";
+
+type MessageType = "text" | "media" | "template" | "interactive";
+
+type MessageStatus = "sent" | "delivered" | "read" | "failed";
+
+type ConversationState = "active" | "inactive" | "paused" | "complete";
+
+type EmailCategory = "welcome" | "follow_up" | "nurture" | "notification";
+
+type EmailStatus = "sent" | "delivered" | "opened" | "clicked" | "bounced";
+
+type TaskPriority = "low" | "medium" | "high" | "urgent";
+
+type TaskStatus = "pending" | "in_progress" | "completed" | "cancelled";
+
+type SequenceStepType = "email" | "whatsapp" | "task" | "notification";
+
+type SequenceStatus = "active" | "paused" | "completed" | "cancelled";
+
+type FacebookLeadStatus = "new" | "processed" | "invalid";
+
+type WebhookStatus = "received" | "processed" | "failed";
+
+type Timeframe = "immediate" | "1-3 months" | "3-6 months" | "6+ months";
+
+type LeadSourceType = "online" | "offline" | "referral" | "other";
+
+type ActivityType =
+  | "status_change"
+  | "source_added"
+  | "tag_added"
+  | "tag_removed"
+  | "interaction_added"
+  | "task_created"
+  | "task_completed";
