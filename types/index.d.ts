@@ -55,7 +55,7 @@ interface TypedAuthError extends AuthError {
 type TagEntity = {
   id: string;
   name: string;
-  color: string;
+  color: string | null;
   description: string | null;
   createdAt: Date;
 };
@@ -123,8 +123,4 @@ type LeadStats = {
   byTimeframe: TimeframeStat[];
 };
 
-// Type for the complete response from lead.getStats
-type LeadStatsResponse = {
-  success: boolean;
-  stats: LeadStats;
-};
+// -------------------------------------------  -------------------------------------------

@@ -12,9 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Pencil, Trash2, Eye } from "lucide-react";
 import { getLeadStatusIndicator } from "@/lib/leads/utils/lead-utils";
-import { ViewLeadModal } from "./ViewLeadModal";
 import { EditLeadModal } from "./EditLeadModal";
 import { DeleteLeadDialog } from "./DeleteLeadDialog";
+import { useRouter } from "next/navigation";
 
 // Create a type for contact info to handle email and phone
 type ContactInfo = {
@@ -45,14 +45,13 @@ type LeadTableProps = {
 export function LeadTable({ leads, isLoading }: LeadTableProps) {
   // State for managing modals
   const [selectedLead, setSelectedLead] = useState<LeadWithTags | null>(null);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const router = useRouter();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Function to open the view modal
   const handleView = (lead: LeadWithTags) => {
-    setSelectedLead(lead);
-    setIsViewModalOpen(true);
+    router.push(`/dashboard/leads/${lead.id}`);
   };
 
   // Function to open the edit modal
@@ -182,15 +181,6 @@ export function LeadTable({ leads, isLoading }: LeadTableProps) {
           </div>
         </CardContent>
       </Card>
-
-      {/* View Lead Modal */}
-      {selectedLead && (
-        <ViewLeadModal
-          lead={selectedLead}
-          isOpen={isViewModalOpen}
-          onClose={() => setIsViewModalOpen(false)}
-        />
-      )}
 
       {/* Edit Lead Modal */}
       {selectedLead && (
