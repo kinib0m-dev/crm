@@ -1,0 +1,261 @@
+import { useState } from "react";
+import { trpc } from "@/trpc/client";
+import { toast } from "sonner";
+import {
+  CreateLeadInput,
+  UpdateLeadInput,
+  LeadFilterInput,
+} from "@/lib/validation/lead-schema";
+import { useMemo } from "react";
+
+/**
+ * Hook for lead listing with filtering and pagination
+ */
+export function useLeadList(initialFilters: Partial<LeadFilterInput> = {}) {
+  // Default filters
+  const defaultFilters: LeadFilterInput = {
+    page: 1,
+    limit: 10,
+    sortBy: "createdAt",
+    sortDirection: "desc",
+    ...initialFilters,
+  };
+
+  // State for filters
+  const [filters, setFilters] = useState<LeadFilterInput>(defaultFilters);
+
+  // Fetch leads with trpc
+  const { data, isLoading, isError, error, refetch } = trpc.lead.list.useQuery(
+    filters,
+    {
+      // Remove the keepPreviousData option entirely
+      staleTime: 30 * 1000, // 30 seconds
+    }
+  );
+
+  // Computed properties
+  const leads = data?.leads || [];
+  const pagination = data?.pagination || {
+    page: 1,
+    limit: 10,
+    totalCount: 0,
+    totalPages: 0,
+  };
+
+  // Update filters
+  const updateFilters = (newFilters: Partial<LeadFilterInput>) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      ...newFilters,
+      // Reset to page 1 when filters change (unless page is explicitly specified)
+      page: newFilters.page || 1,
+    }));
+  };
+
+  // Reset filters
+  const resetFilters = () => {
+    setFilters(defaultFilters);
+  };
+
+  // Handle pagination
+  const goToPage = (page: number) => {
+    if (page < 1 || page > pagination.totalPages) return;
+    updateFilters({ page });
+  };
+
+  return {
+    leads,
+    filters,
+    pagination,
+    isLoading,
+    isError,
+    error,
+    updateFilters,
+    resetFilters,
+    refetch,
+    goToPage,
+  };
+}
+
+/**
+ * Hook for lead creation
+ */
+export function useCreateLead() {
+  const utils = trpc.useUtils();
+
+  const mutation = trpc.lead.create.useMutation({
+    onSuccess: () => {
+      // Invalidate queries to refetch lead list
+      utils.lead.list.invalidate();
+      toast.success("Lead created successfully");
+    },
+    onError: (error) => {
+      toast.error(`Error creating lead: ${error.message}`);
+    },
+  });
+
+  const createLead = async (lead: CreateLeadInput) => {
+    try {
+      return await mutation.mutateAsync(lead);
+    } catch (error) {
+      console.error("Error creating lead:", error);
+      throw error;
+    }
+  };
+
+  return {
+    createLead,
+    isLoading: mutation.isPending,
+    isError: mutation.isError,
+    error: mutation.error,
+  };
+}
+
+/**
+ * Hook for fetching a single lead by ID
+ */
+export function useLead(id: string) {
+  const enabled = !!id;
+
+  const { data, isLoading, isError, error, refetch } =
+    trpc.lead.getById.useQuery(
+      { id },
+      {
+        enabled,
+        staleTime: 30 * 1000, // 30 seconds
+      }
+    );
+
+  return {
+    lead: data?.lead,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  };
+}
+
+/**
+ * Hook for updating a lead
+ */
+export function useUpdateLead() {
+  const utils = trpc.useUtils();
+
+  const mutation = trpc.lead.update.useMutation({
+    onSuccess: (data) => {
+      // Invalidate queries to refetch leads
+      utils.lead.list.invalidate();
+      utils.lead.getById.invalidate({ id: data.lead.id });
+      toast.success("Lead updated successfully");
+    },
+    onError: (error) => {
+      toast.error(`Error updating lead: ${error.message}`);
+    },
+  });
+
+  const updateLead = async (lead: UpdateLeadInput) => {
+    try {
+      return await mutation.mutateAsync(lead);
+    } catch (error) {
+      console.error("Error updating lead:", error);
+      throw error;
+    }
+  };
+
+  return {
+    updateLead,
+    isLoading: mutation.isPending,
+    isError: mutation.isError,
+    error: mutation.error,
+  };
+}
+
+/**
+ * Hook for deleting a lead
+ */
+export function useDeleteLead() {
+  const utils = trpc.useUtils();
+
+  const mutation = trpc.lead.delete.useMutation({
+    onSuccess: () => {
+      // Invalidate queries to refetch lead list
+      utils.lead.list.invalidate();
+      toast.success("Lead deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(`Error deleting lead: ${error.message}`);
+    },
+  });
+
+  const deleteLead = async (id: string) => {
+    try {
+      return await mutation.mutateAsync({ id });
+    } catch (error) {
+      console.error("Error deleting lead:", error);
+      throw error;
+    }
+  };
+
+  return {
+    deleteLead,
+    isLoading: mutation.isPending,
+    isError: mutation.isError,
+    error: mutation.error,
+  };
+}
+
+/**
+ * Hook for lead statistics
+ */
+export function useLeadStats() {
+  const { data, isLoading, isError, error, refetch } =
+    trpc.lead.getStats.useQuery(undefined, {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    });
+
+  // Process the stats for easier consumption
+  const processedStats = useMemo(() => {
+    if (!data?.stats) return null;
+
+    return {
+      total: data.stats.total,
+      byStatus: data.stats.byStatus.reduce(
+        (acc, item) => {
+          acc[item.status] = item.count;
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
+      byPriority: data.stats.byPriority.reduce(
+        (acc, item) => {
+          // Handle the case where priority might be null
+          if (item.priority !== null && item.priority !== undefined) {
+            acc[item.priority.toString()] = item.count;
+          } else {
+            // You can either skip null priorities or store them with a special key
+            acc["unknown"] = (acc["unknown"] || 0) + item.count;
+          }
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
+      byTimeframe: data.stats.byTimeframe.reduce(
+        (acc, item) => {
+          if (item.timeframe) {
+            acc[item.timeframe] = item.count;
+          }
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
+    };
+  }, [data]);
+
+  return {
+    stats: processedStats,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  };
+}

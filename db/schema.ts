@@ -300,7 +300,6 @@ export const activityTypeEnum = pgEnum("activity_type", [
   "task_completed",
 ]);
 
-// Tables
 export const leads = pgTable("leads", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: text("user_id")
