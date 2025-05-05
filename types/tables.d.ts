@@ -5,7 +5,6 @@ interface Lead {
   name: string;
   email?: string;
   phone?: string;
-  whatsappNumber?: string;
   status: LeadStatus;
   sourceId?: string;
   priority: number;

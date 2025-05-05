@@ -309,7 +309,6 @@ export const leads = pgTable("leads", {
   name: text("name").notNull(),
   email: text("email"),
   phone: text("phone"),
-  whatsappNumber: text("whatsapp_number"),
   status: leadStatusEnum("status").default("new_lead").notNull(),
   sourceId: uuid("source_id").references(() => leadSources.id),
   priority: integer("priority").default(3),
