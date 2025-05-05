@@ -7,6 +7,7 @@ import {
   LeadFilterInput,
 } from "@/lib/validation/lead-schema";
 import { useMemo } from "react";
+import { useRouter } from "next/navigation";
 
 /**
  * Hook for lead listing with filtering and pagination
@@ -82,12 +83,14 @@ export function useLeadList(initialFilters: Partial<LeadFilterInput> = {}) {
  */
 export function useCreateLead() {
   const utils = trpc.useUtils();
+  const router = useRouter();
 
   const mutation = trpc.lead.create.useMutation({
     onSuccess: () => {
       // Invalidate queries to refetch lead list
       utils.lead.list.invalidate();
       toast.success("Lead created successfully");
+      router.refresh();
     },
     onError: (error) => {
       toast.error(`Error creating lead: ${error.message}`);
@@ -140,6 +143,7 @@ export function useLead(id: string) {
  */
 export function useUpdateLead() {
   const utils = trpc.useUtils();
+  const router = useRouter();
 
   const mutation = trpc.lead.update.useMutation({
     onSuccess: (data) => {
@@ -147,6 +151,7 @@ export function useUpdateLead() {
       utils.lead.list.invalidate();
       utils.lead.getById.invalidate({ id: data.lead.id });
       toast.success("Lead updated successfully");
+      router.refresh();
     },
     onError: (error) => {
       toast.error(`Error updating lead: ${error.message}`);
@@ -175,11 +180,13 @@ export function useUpdateLead() {
  */
 export function useDeleteLead() {
   const utils = trpc.useUtils();
+  const router = useRouter();
 
   const mutation = trpc.lead.delete.useMutation({
     onSuccess: () => {
-      // Invalidate queries to refetch lead list
       utils.lead.list.invalidate();
+      utils.lead.getStats.invalidate();
+      router.refresh();
       toast.success("Lead deleted successfully");
     },
     onError: (error) => {
