@@ -1,7 +1,7 @@
 /**
  * Formats a lead's contact information into a standardized display format
  */
-export function formatLeadContact(lead: Lead) {
+export function formatLeadContact(lead: LeadWithTags) {
   const contact = [];
 
   if (lead.email) {
@@ -31,7 +31,7 @@ export function daysSinceLastContact(lead: LeadWithTags): number | null {
 /**
  * Calculates days until next follow-up
  */
-export function daysUntilNextFollowUp(lead: Lead): number | null {
+export function daysUntilNextFollowUp(lead: LeadWithTags): number | null {
   if (!lead.nextFollowUpDate) return null;
 
   const followUpDate = new Date(lead.nextFollowUpDate);
@@ -44,7 +44,7 @@ export function daysUntilNextFollowUp(lead: Lead): number | null {
 /**
  * Determines the visual status indicator for a lead
  */
-export function getLeadStatusIndicator(lead: Lead) {
+export function getLeadStatusIndicator(lead: LeadWithTags) {
   // Define status categories and their corresponding colors
   const statusColors = {
     new: ["new_lead", "initial_contact"],

@@ -10,13 +10,13 @@ export function LeadsLayout() {
   return (
     <Suspense fallback={<LeadsLoader />}>
       <ErrorBoundary fallback={<LeadsError />}>
-        <LeadsSuspense />
+        <LeadsLayoutSuspense />
       </ErrorBoundary>
     </Suspense>
   );
 }
 
-function LeadsSuspense() {
+function LeadsLayoutSuspense() {
   // Fetch leads and stats
   const { data: leadsData, isLoading: isLeadsLoading } =
     trpc.lead.list.useQuery({ page: 1, limit: 10 });

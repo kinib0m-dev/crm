@@ -174,8 +174,6 @@ export function useUpdateLead() {
   };
 }
 
-/*
-
 export function useDeleteLead() {
   const utils = trpc.useUtils();
   const router = useRouter();
@@ -183,7 +181,6 @@ export function useDeleteLead() {
   const mutation = trpc.lead.delete.useMutation({
     onSuccess: () => {
       utils.lead.list.invalidate();
-      utils.lead.getStats.invalidate();
       router.refresh();
       toast.success("Lead deleted successfully");
     },
@@ -209,7 +206,7 @@ export function useDeleteLead() {
   };
 }
 
-
+/*
 export function useLeadStats() {
   const { data, isLoading, isError, error, refetch } =
     trpc.lead.getStats.useQuery(undefined, {
