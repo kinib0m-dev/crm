@@ -126,15 +126,15 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
 
     switch (priority) {
       case 1:
-        return { label: "Very Low", color: "bg-gray-100 text-gray-800" };
+        return { label: "Very High", color: "bg-red-100 text-red-800" };
       case 2:
-        return { label: "Low", color: "bg-blue-100 text-blue-800" };
+        return { label: "High", color: "bg-orange-100 text-orange-800" };
       case 3:
         return { label: "Medium", color: "bg-yellow-100 text-yellow-800" };
       case 4:
-        return { label: "High", color: "bg-orange-100 text-orange-800" };
+        return { label: "Low", color: "bg-blue-100 text-blue-800" };
       case 5:
-        return { label: "Very High", color: "bg-red-100 text-red-800" };
+        return { label: "Very Low", color: "bg-gray-100 text-gray-800" };
       default:
         return { label: "Not set", color: "bg-gray-100 text-gray-800" };
     }
@@ -155,10 +155,6 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
     }
   };
 
-  const handleEdit = () => {
-    router.push(`/leads/${lead.id}/edit`);
-  };
-
   return (
     <div className="container mx-auto p-6 space-y-8">
       {/* Page Header */}
@@ -173,9 +169,11 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
           <h1 className="text-2xl font-bold">Lead Details</h1>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleEdit}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
+          <Button variant="outline" asChild>
+            <Link href={`/leads/${lead.id}/edit`}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Link>
           </Button>
           <Dialog
             open={isDeleteDialogOpen}
@@ -476,9 +474,11 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
         <TabsContent value="notes">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold">Notes</h3>
-            <Button>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Add Note
+            <Button asChild>
+              <Link href={`/leads/${lead.id}/notes`}>
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Add Note
+              </Link>
             </Button>
           </div>
 
@@ -491,9 +491,11 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
                   Keep important information and context about this lead by
                   adding notes.
                 </p>
-                <Button className="mt-4">
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Add First Note
+                <Button className="mt-4" asChild>
+                  <Link href={`/leads/${lead.id}/notes`}>
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Add First Note
+                  </Link>
                 </Button>
               </div>
             </CardContent>
