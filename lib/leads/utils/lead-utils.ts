@@ -18,7 +18,7 @@ export function formatLeadContact(lead: Lead) {
 /**
  * Calculates days since last contact
  */
-export function daysSinceLastContact(lead: Lead): number | null {
+export function daysSinceLastContact(lead: LeadWithTags): number | null {
   if (!lead.lastContactedAt) return null;
 
   const lastContactDate = new Date(lead.lastContactedAt);

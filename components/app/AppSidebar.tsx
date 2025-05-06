@@ -23,6 +23,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "../ui/separator";
 import { cn } from "@/lib/utils";
@@ -43,13 +44,21 @@ export function AppSidebar({ name, email, image }: UserMenuProps) {
     return pathname.startsWith(route);
   };
 
+  const { open } = useSidebar();
+
   return (
     <Sidebar collapsible="icon" variant="floating">
       <SidebarHeader className="p-4">
-        <div className="flex items-center justify-between">
-          <Link href="/dashboard" className="text-xl font-bold">
-            CRM
-          </Link>
+        <div className="flex items-center">
+          {open ? (
+            <Link href="/dashboard" className="text-xl font-bold">
+              CRM
+            </Link>
+          ) : (
+            <Link href="/dashboard" className="text-xs font-bold">
+              CRM
+            </Link>
+          )}
         </div>
       </SidebarHeader>
       <Separator />
@@ -189,7 +198,7 @@ export function AppSidebar({ name, email, image }: UserMenuProps) {
       <SidebarFooter>
         <SidebarGroup>
           <SidebarGroupLabel className="px-2">Account</SidebarGroupLabel>
-          <div className="flex justify-between items-center">
+          <div className="flex items-center">
             <UserMenu name={name} email={email} image={image} />
           </div>
         </SidebarGroup>

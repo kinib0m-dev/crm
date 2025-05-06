@@ -2,19 +2,18 @@ import { useState } from "react";
 import { trpc } from "@/trpc/client";
 import { toast } from "sonner";
 import {
-  CreateLeadInput,
-  UpdateLeadInput,
-  LeadFilterInput,
+  CreateLeadSchema,
+  FilterLeadSchema,
+  UpdateLeadSchema,
 } from "@/lib/validation/lead-schema";
-import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 /**
  * Hook for lead listing with filtering and pagination
  */
-export function useLeadList(initialFilters: Partial<LeadFilterInput> = {}) {
+export function useLeadList(initialFilters: Partial<FilterLeadSchema> = {}) {
   // Default filters
-  const defaultFilters: LeadFilterInput = {
+  const defaultFilters: FilterLeadSchema = {
     page: 1,
     limit: 10,
     sortBy: "createdAt",
@@ -23,7 +22,7 @@ export function useLeadList(initialFilters: Partial<LeadFilterInput> = {}) {
   };
 
   // State for filters
-  const [filters, setFilters] = useState<LeadFilterInput>(defaultFilters);
+  const [filters, setFilters] = useState<FilterLeadSchema>(defaultFilters);
 
   // Fetch leads with trpc
   const { data, isLoading, isError, error, refetch } = trpc.lead.list.useQuery(
@@ -44,7 +43,7 @@ export function useLeadList(initialFilters: Partial<LeadFilterInput> = {}) {
   };
 
   // Update filters
-  const updateFilters = (newFilters: Partial<LeadFilterInput>) => {
+  const updateFilters = (newFilters: Partial<FilterLeadSchema>) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
       ...newFilters,
@@ -97,7 +96,7 @@ export function useCreateLead() {
     },
   });
 
-  const createLead = async (lead: CreateLeadInput) => {
+  const createLead = async (lead: CreateLeadSchema) => {
     try {
       return await mutation.mutateAsync(lead);
     } catch (error) {
@@ -158,7 +157,7 @@ export function useUpdateLead() {
     },
   });
 
-  const updateLead = async (lead: UpdateLeadInput) => {
+  const updateLead = async (lead: UpdateLeadSchema) => {
     try {
       return await mutation.mutateAsync(lead);
     } catch (error) {
@@ -175,9 +174,8 @@ export function useUpdateLead() {
   };
 }
 
-/**
- * Hook for deleting a lead
- */
+/*
+
 export function useDeleteLead() {
   const utils = trpc.useUtils();
   const router = useRouter();
@@ -211,9 +209,7 @@ export function useDeleteLead() {
   };
 }
 
-/**
- * Hook for lead statistics
- */
+
 export function useLeadStats() {
   const { data, isLoading, isError, error, refetch } =
     trpc.lead.getStats.useQuery(undefined, {
@@ -265,4 +261,7 @@ export function useLeadStats() {
     error,
     refetch,
   };
+
+   
 }
+  */

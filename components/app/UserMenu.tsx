@@ -13,6 +13,7 @@ import {
 import { User, Settings, LogOut, ChevronRight } from "lucide-react";
 import { logOut } from "@/lib/auth/auth.actions";
 import Link from "next/link";
+import { useSidebar } from "../ui/sidebar";
 
 type UserMenuProps = {
   name?: string | null;
@@ -21,6 +22,7 @@ type UserMenuProps = {
 };
 
 export function UserMenu({ name, email, image }: UserMenuProps) {
+  const { open } = useSidebar();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -34,13 +36,17 @@ export function UserMenu({ name, email, image }: UserMenuProps) {
               </AvatarFallback>
             )}
           </Avatar>
-          <div className="flex flex-col flex-1 overflow-hidden">
-            <span className="text-sm font-medium truncate">{name}</span>
-            <span className="text-xs text-muted-foreground truncate">
-              {email}
-            </span>
-          </div>
-          <ChevronRight size={16} className="text-muted-foreground" />
+          {open && (
+            <>
+              <div className="flex flex-col flex-1 overflow-hidden">
+                <span className="text-sm font-medium truncate">{name}</span>
+                <span className="text-xs text-muted-foreground truncate">
+                  {email}
+                </span>
+              </div>
+              <ChevronRight size={16} className="text-muted-foreground" />
+            </>
+          )}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
