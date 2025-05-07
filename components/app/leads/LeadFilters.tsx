@@ -84,10 +84,10 @@ export function LeadFilters({
   return (
     <Card>
       <CardContent className="p-4">
-        <div className="flex flex-wrap gap-4 items-center">
+        <div className="flex flex-wrap gap-x-4 gap-y-3 items-start sm:items-center">
           {/* Search input */}
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto flex-1">
+            <div className="relative w-full sm:w-64">
               <Input
                 placeholder="Search leads..."
                 value={searchInput}
@@ -97,17 +97,21 @@ export function LeadFilters({
               />
               <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
-            <Button size="sm" onClick={handleSearch}>
+            <Button
+              size="sm"
+              onClick={handleSearch}
+              className="w-full sm:w-auto"
+            >
               Search
             </Button>
           </div>
 
-          {/* Status filter */}
+          {/* Filters */}
           <Select
             value={filters.status || "all_statuses"}
             onValueChange={handleStatusChange}
           >
-            <SelectTrigger className="w-36">
+            <SelectTrigger className="w-full sm:w-36">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -116,13 +120,12 @@ export function LeadFilters({
                 <SelectItem key={status} value={status}>
                   {status
                     .replace(/_/g, " ")
-                    .replace(/\b\w/g, (char) => char.toUpperCase())}
+                    .replace(/\b\w/g, (c) => c.toUpperCase())}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          {/* Priority filter */}
           <Select
             value={filters.priority?.toString() || "all_priorities"}
             onValueChange={(value) =>
@@ -133,7 +136,7 @@ export function LeadFilters({
               })
             }
           >
-            <SelectTrigger className="w-36">
+            <SelectTrigger className="w-full sm:w-36">
               <SelectValue placeholder="Priority" />
             </SelectTrigger>
             <SelectContent>
@@ -146,32 +149,30 @@ export function LeadFilters({
             </SelectContent>
           </Select>
 
-          {/* Timeframe filter */}
           <Select
             value={filters.timeframe || "all_timeframes"}
             onValueChange={handleTimeframeChange}
           >
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-full sm:w-40">
               <SelectValue placeholder="Timeframe" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all_timeframes">All Timeframes</SelectItem>
-              {timeframeEnum.enumValues.map((timeframe) => (
-                <SelectItem key={timeframe} value={timeframe}>
-                  {timeframe
+              {timeframeEnum.enumValues.map((tf) => (
+                <SelectItem key={tf} value={tf}>
+                  {tf
                     .replace(/_/g, " ")
-                    .replace(/\b\w/g, (char) => char.toUpperCase())}
+                    .replace(/\b\w/g, (c) => c.toUpperCase())}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          {/* Sort filter */}
           <Select
             value={`${filters.sortBy || "createdAt"}:${filters.sortDirection || "desc"}`}
             onValueChange={handleSortChange}
           >
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-full sm:w-40">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -190,16 +191,18 @@ export function LeadFilters({
             </SelectContent>
           </Select>
 
-          {/* Clear filters button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleResetFilters}
-            className="ml-auto"
-          >
-            <X className="h-4 w-4 mr-2" />
-            Clear Filters
-          </Button>
+          {/* Clear filters */}
+          <div className="w-full sm:w-auto sm:ml-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetFilters}
+              className="w-full sm:w-auto"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Clear Filters
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

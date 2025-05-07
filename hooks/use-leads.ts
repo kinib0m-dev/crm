@@ -88,7 +88,6 @@ export function useCreateLead() {
     onSuccess: () => {
       // Invalidate queries to refetch lead list
       utils.lead.list.invalidate();
-      toast.success("Lead created successfully");
       router.refresh();
     },
     onError: (error) => {

@@ -416,9 +416,14 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
         <TabsContent value="interactions">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold">Interactions</h3>
-            <Button>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Add Interaction
+            <Button asChild>
+              <Link
+                href={`/leads/${lead.id}/interactions`}
+                className="flex items-center gap-1"
+              >
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Add Interaction
+              </Link>
             </Button>
           </div>
 
@@ -433,9 +438,14 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
                   Track your meetings, calls, and messages with this lead to
                   keep everything organized.
                 </p>
-                <Button className="mt-4">
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Record First Interaction
+                <Button className="mt-4" asChild>
+                  <Link
+                    href={`/leads/${lead.id}/interactions`}
+                    className="flex items-center gap-1"
+                  >
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Record First Interaction
+                  </Link>
                 </Button>
               </div>
             </CardContent>
@@ -446,9 +456,14 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
         <TabsContent value="tasks">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold">Tasks</h3>
-            <Button>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Add Task
+            <Button asChild>
+              <Link
+                href={`/leads/${lead.id}/tasks`}
+                className="flex items-center gap-1"
+              >
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Add Task
+              </Link>
             </Button>
           </div>
 
@@ -461,9 +476,14 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
                   Create tasks to track follow-ups, deadlines, and actions
                   needed for this lead.
                 </p>
-                <Button className="mt-4">
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Create First Task
+                <Button className="mt-4" asChild>
+                  <Link
+                    href={`/leads/${lead.id}/tasks`}
+                    className="flex items-center gap-1"
+                  >
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Create First Task
+                  </Link>
                 </Button>
               </div>
             </CardContent>
@@ -475,7 +495,10 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold">Notes</h3>
             <Button asChild>
-              <Link href={`/leads/${lead.id}/notes`}>
+              <Link
+                href={`/leads/${lead.id}/notes`}
+                className="flex items-center gap-1"
+              >
                 <PlusCircle className="h-4 w-4 mr-2" />
                 Add Note
               </Link>
@@ -492,7 +515,10 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
                   adding notes.
                 </p>
                 <Button className="mt-4" asChild>
-                  <Link href={`/leads/${lead.id}/notes`}>
+                  <Link
+                    href={`/leads/${lead.id}/notes`}
+                    className="flex items-center gap-1"
+                  >
                     <PlusCircle className="h-4 w-4 mr-2" />
                     Add First Note
                   </Link>
@@ -506,9 +532,14 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
         <TabsContent value="emails">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold">Emails</h3>
-            <Button>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Send Email
+            <Button asChild>
+              <Link
+                href={`/leads/${lead.id}/emails`}
+                className="flex items-center gap-1"
+              >
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Send Email
+              </Link>
             </Button>
           </div>
 
@@ -521,9 +552,14 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
                   Send and track emails to communicate with this lead directly
                   from the CRM.
                 </p>
-                <Button className="mt-4">
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Compose Email
+                <Button className="mt-4" asChild>
+                  <Link
+                    href={`/leads/${lead.id}/emails`}
+                    className="flex items-center gap-1"
+                  >
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Compose Email
+                  </Link>
                 </Button>
               </div>
             </CardContent>
