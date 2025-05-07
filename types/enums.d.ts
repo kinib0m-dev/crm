@@ -66,3 +66,14 @@ type ActivityType =
   | "interaction_added"
   | "task_created"
   | "task_completed";
+
+type DocCategory =
+  | "other"
+  | "company_profile"
+  | "pricing"
+  | "financing"
+  | "faq"
+  | "service"
+  | "maintenance"
+  | "legal"
+  | "product_info";

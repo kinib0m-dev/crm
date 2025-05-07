@@ -554,3 +554,31 @@ export const metrics = pgTable("metrics", {
   metadata: jsonb("metadata"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// -------------------------------------- BOT DOCS --------------------------------------
+export const documentCategoryEnum = pgEnum("document_category", [
+  "company_profile",
+  "pricing",
+  "financing",
+  "faq",
+  "service",
+  "maintenance",
+  "legal",
+  "product_info",
+  "other",
+]);
+
+// Bot Documents table for storing text content for embedding
+export const botDocuments = pgTable("bot_documents", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  category: documentCategoryEnum("category").default("other").notNull(),
+  content: text("content").notNull(),
+  fileName: text("file_name"),
+  embedding: text("embedding"), // Will store vector embedding as string
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});

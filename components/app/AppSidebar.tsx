@@ -10,6 +10,7 @@ import {
   GitBranch,
   Settings,
   FileSpreadsheet,
+  Truck,
 } from "lucide-react";
 import { UserMenu } from "@/components/app/UserMenu";
 import {
@@ -152,19 +153,36 @@ export function AppSidebar({ name, email, image }: UserMenuProps) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              {/* Import/Export */}
+              {/* Stock */}
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  tooltip="Import/Export"
+                  tooltip="Stock"
                   className={cn({
                     "bg-primary/90 text-background px-2 py-1 rounded-lg hover:bg-primary/90 hover:text-background":
-                      isActiveRoute("/import-export"),
+                      isActiveRoute("/stock"),
                   })}
                 >
-                  <Link href="/import-export">
+                  <Link href="/stock">
+                    <Truck />
+                    <span>Stock</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* Bot Docs */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip="Bot Docs"
+                  className={cn({
+                    "bg-primary/90 text-background px-2 py-1 rounded-lg hover:bg-primary/90 hover:text-background":
+                      isActiveRoute("/bot-docs"),
+                  })}
+                >
+                  <Link href="/bot-docs">
                     <FileSpreadsheet />
-                    <span>Import/Export</span>
+                    <span>Bot Docs</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
