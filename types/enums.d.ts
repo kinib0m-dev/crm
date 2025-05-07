@@ -77,3 +77,18 @@ type DocCategory =
   | "maintenance"
   | "legal"
   | "product_info";
+
+type CarTypes =
+  | "sedan"
+  | "suv"
+  | "hatchback"
+  | "coupe"
+  | "convertible"
+  | "wagon"
+  | "minivan"
+  | "pickup"
+  | "electric"
+  | "hybrid"
+  | "luxury"
+  | "sports"
+  | "other";

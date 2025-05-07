@@ -160,10 +160,10 @@ export function AppSidebar({ name, email, image }: UserMenuProps) {
                   tooltip="Stock"
                   className={cn({
                     "bg-primary/90 text-background px-2 py-1 rounded-lg hover:bg-primary/90 hover:text-background":
-                      isActiveRoute("/stock"),
+                      isActiveRoute("/car-stock"),
                   })}
                 >
-                  <Link href="/stock">
+                  <Link href="/car-stock">
                     <Truck />
                     <span>Stock</span>
                   </Link>
