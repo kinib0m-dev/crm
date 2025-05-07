@@ -9,6 +9,7 @@ import {
 } from "@/lib/validation/bot-document-schema";
 import { TRPCError } from "@trpc/server";
 import { eq, and, or, ilike, sql, asc, desc } from "drizzle-orm";
+import { generateEmbedding } from "../bot-doc.actions";
 
 export const botDocumentRouter = createTRPCRouter({
   // Create a new bot document
@@ -18,7 +19,18 @@ export const botDocumentRouter = createTRPCRouter({
       try {
         const userId = ctx.userId as string;
 
-        // Insert the new document
+        // Generate embedding for the document content
+        let embedding = null;
+        try {
+          embedding = await generateEmbedding(input.content);
+        } catch (embeddingError) {
+          console.error(
+            "Error generating embedding, continuing without it:",
+            embeddingError
+          );
+        }
+
+        // Insert the new document with embedding
         const [newDocument] = await db
           .insert(botDocuments)
           .values({
@@ -27,6 +39,7 @@ export const botDocumentRouter = createTRPCRouter({
             category: input.category,
             content: input.content,
             fileName: input.fileName,
+            embedding: embedding,
           })
           .returning();
 
@@ -110,11 +123,28 @@ export const botDocumentRouter = createTRPCRouter({
           });
         }
 
-        // Update the document
+        // If content has changed, regenerate the embedding
+        let embeddingUpdate = {};
+
+        if (updateData.content !== existingDoc.content) {
+          try {
+            const newEmbedding = await generateEmbedding(updateData.content);
+            embeddingUpdate = { embedding: newEmbedding };
+          } catch (embeddingError) {
+            console.error(
+              "Error generating embedding, continuing without it:",
+              embeddingError
+            );
+            // We'll continue with embedding as null
+          }
+        }
+
+        // Update the document with possibly new embedding
         const [updatedDoc] = await db
           .update(botDocuments)
           .set({
             ...updateData,
+            ...embeddingUpdate,
             updatedAt: new Date(),
           })
           .where(and(eq(botDocuments.id, id), eq(botDocuments.userId, userId)))

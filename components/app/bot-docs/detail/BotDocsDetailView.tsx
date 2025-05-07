@@ -226,17 +226,23 @@ export function BotDocumentDetailView({
               </div>
             </div>
 
-            {document.embedding && (
-              <div className="flex items-center gap-3">
-                <FileCode className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <div className="text-sm text-muted-foreground">
-                    Embedding Status
-                  </div>
-                  <div className="font-medium">Generated</div>
+            <div className="flex items-center gap-3">
+              <FileCode className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <div className="text-sm text-muted-foreground">
+                  Embedding Status
+                </div>
+                <div className="font-medium">
+                  {document.embedding ? (
+                    <span className="text-green-600">
+                      Generated successfully
+                    </span>
+                  ) : (
+                    <span className="text-amber-600">Not generated</span>
+                  )}
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </CardContent>
       </Card>

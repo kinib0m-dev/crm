@@ -9,6 +9,7 @@ import {
   pgEnum,
   jsonb,
   date,
+  customType,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
@@ -567,6 +568,23 @@ export const documentCategoryEnum = pgEnum("document_category", [
   "product_info",
   "other",
 ]);
+const vector = (dimensions: number) =>
+  customType<{
+    data: number[];
+    driverData: string;
+  }>({
+    dataType() {
+      return `vector(${dimensions})`;
+    },
+    toDriver(value) {
+      // Format as Postgres array string for pgvector: e.g. '[0.1, 0.2, ...]'
+      return `[${value.join(",")}]`;
+    },
+    fromDriver(value) {
+      // Convert PG string back to array
+      return value.slice(1, -1).split(",").map(Number);
+    },
+  });
 
 // Bot Documents table for storing text content for embedding
 export const botDocuments = pgTable("bot_documents", {
@@ -578,7 +596,7 @@ export const botDocuments = pgTable("bot_documents", {
   category: documentCategoryEnum("category").default("other").notNull(),
   content: text("content").notNull(),
   fileName: text("file_name"),
-  embedding: text("embedding"), // Will store vector embedding as string
+  embedding: vector(768)("vector"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
