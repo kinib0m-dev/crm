@@ -48,17 +48,17 @@ type EmailHistoryDetails = {
   subject: string;
   sentAt: Date;
   sentCount: number;
-  templateName: string;
-  templateContent: string;
+  templateName: string | null;
+  templateContent: string | null;
 };
 
 type EmailRecipient = {
   leadId: string;
   sentAt: Date;
   status: string;
-  leadName: string;
-  leadEmail: string;
-  leadStatus: string;
+  leadName: string | null;
+  leadEmail: string | null;
+  leadStatus: string | null;
 };
 
 interface EmailHistoryDetailsViewProps {
@@ -153,19 +153,22 @@ export function EmailHistoryDetailsView({
   const filteredRecipients = recipients.filter((recipient) => {
     const matchesSearch =
       !searchQuery ||
-      recipient.leadName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      recipient.leadEmail.toLowerCase().includes(searchQuery.toLowerCase());
+      (recipient.leadName?.toLowerCase() || "").includes(
+        searchQuery.toLowerCase()
+      ) ||
+      (recipient.leadEmail?.toLowerCase() || "").includes(
+        searchQuery.toLowerCase()
+      );
 
     const matchesStatus =
       !statusFilter || recipient.leadStatus === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
-
   // Get unique lead statuses for filter dropdown
   const uniqueStatuses = Array.from(
-    new Set(recipients.map((recipient) => recipient.leadStatus))
-  );
+    new Set(recipients.map((recipient) => recipient.leadStatus).filter(Boolean))
+  ) as string[];
 
   return (
     <div className="container mx-auto p-6 space-y-8">
@@ -232,7 +235,7 @@ export function EmailHistoryDetailsView({
                     href={`/emails/${history.templateId}`}
                     className="text-primary hover:underline"
                   >
-                    {history.templateName}
+                    {history.templateName || "Unnamed Template"}
                   </Link>
                 </div>
               </div>
@@ -260,7 +263,7 @@ export function EmailHistoryDetailsView({
               <div
                 className="prose max-w-none p-4 border rounded-md bg-muted/30"
                 dangerouslySetInnerHTML={{
-                  __html: history.templateContent,
+                  __html: history.templateContent || "",
                 }}
               />
             </div>
@@ -361,13 +364,19 @@ export function EmailHistoryDetailsView({
                   {filteredRecipients.map((recipient) => (
                     <TableRow key={recipient.leadId}>
                       <TableCell className="font-medium">
-                        {recipient.leadName}
+                        {recipient.leadName || "Unknown"}
                       </TableCell>
-                      <TableCell>{recipient.leadEmail}</TableCell>
+                      <TableCell>{recipient.leadEmail || "No email"}</TableCell>
                       <TableCell>
-                        <Badge className={getStatusColor(recipient.leadStatus)}>
-                          {formatStatus(recipient.leadStatus)}
-                        </Badge>
+                        {recipient.leadStatus ? (
+                          <Badge
+                            className={getStatusColor(recipient.leadStatus)}
+                          >
+                            {formatStatus(recipient.leadStatus)}
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline">No Status</Badge>
+                        )}
                       </TableCell>
                       <TableCell>
                         {getDeliveryStatusBadge(recipient.status)}

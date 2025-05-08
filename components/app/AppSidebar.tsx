@@ -10,6 +10,7 @@ import {
   FileSpreadsheet,
   Truck,
   Puzzle,
+  History,
 } from "lucide-react";
 import { UserMenu } from "@/components/app/UserMenu";
 import {
@@ -40,6 +41,12 @@ export function AppSidebar({ name, email, image }: UserMenuProps) {
   const isActiveRoute = (route: string) => {
     if (route === "/dashboard") {
       return pathname === route;
+    }
+    if (route === "/emails") {
+      return (
+        pathname === "/emails" ||
+        (pathname.startsWith("/emails") && pathname !== "/emails/history")
+      );
     }
     return pathname.startsWith(route);
   };
@@ -114,6 +121,23 @@ export function AppSidebar({ name, email, image }: UserMenuProps) {
                   <Link href="/emails">
                     <Mail />
                     <span>Emails</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* Emails */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip="Email History"
+                  className={cn({
+                    "bg-primary/90 text-background px-2 py-1 rounded-lg hover:bg-primary/90 hover:text-background":
+                      isActiveRoute("/emails/history"),
+                  })}
+                >
+                  <Link href="/emails/history">
+                    <History />
+                    <span>Email History</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

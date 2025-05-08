@@ -87,7 +87,8 @@ export function DuplicateEmailTemplateView({
       name: `${template.name} (Copy)`,
       subject: template.subject,
       content: template.content,
-      targetStatuses: template.targetStatuses,
+      targetStatuses:
+        template.targetStatuses as typeof leadStatusEnum.enumValues,
       description: template.description || undefined,
     },
   });
@@ -117,7 +118,11 @@ export function DuplicateEmailTemplateView({
       : [...selectedStatuses, selectedStatus];
 
     setSelectedStatuses(updatedStatuses);
-    form.setValue("targetStatuses", updatedStatuses, { shouldValidate: true });
+    form.setValue(
+      "targetStatuses",
+      updatedStatuses as typeof leadStatusEnum.enumValues,
+      { shouldValidate: true }
+    );
   };
 
   // Get preview of email content with variables replaced
@@ -150,7 +155,7 @@ export function DuplicateEmailTemplateView({
       {/* Edit Form */}
       <Card>
         <CardHeader>
-          <CardTitle>Create a Copy of "{template.name}"</CardTitle>
+          <CardTitle>Create a Copy of &quot;{template.name}&quot;</CardTitle>
           <CardDescription>
             Duplicate this template and customize it as needed
           </CardDescription>
@@ -200,7 +205,7 @@ export function DuplicateEmailTemplateView({
                 <FormField
                   control={form.control}
                   name="targetStatuses"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>Target Lead Statuses*</FormLabel>
                       <FormDescription>
@@ -438,7 +443,7 @@ export function DuplicateEmailTemplateView({
                           />
                         ) : (
                           <div className="text-muted-foreground italic">
-                            No content
+                            {previewMode ? "No content" : "No content"}
                           </div>
                         )}
                       </div>

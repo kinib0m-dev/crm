@@ -88,7 +88,8 @@ export function EmailTemplateEditView({
       name: template.name,
       subject: template.subject,
       content: template.content,
-      targetStatuses: template.targetStatuses,
+      targetStatuses:
+        template.targetStatuses as typeof leadStatusEnum.enumValues,
       description: template.description || undefined,
     },
   });
@@ -118,7 +119,13 @@ export function EmailTemplateEditView({
       : [...selectedStatuses, selectedStatus];
 
     setSelectedStatuses(updatedStatuses);
-    form.setValue("targetStatuses", updatedStatuses, { shouldValidate: true });
+
+    // Add type casting here
+    form.setValue(
+      "targetStatuses",
+      updatedStatuses as typeof leadStatusEnum.enumValues,
+      { shouldValidate: true }
+    );
   };
 
   // Get preview of email content with variables replaced
@@ -201,7 +208,7 @@ export function EmailTemplateEditView({
                 <FormField
                   control={form.control}
                   name="targetStatuses"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>Target Lead Statuses*</FormLabel>
                       <FormDescription>
@@ -439,7 +446,7 @@ export function EmailTemplateEditView({
                           />
                         ) : (
                           <div className="text-muted-foreground italic">
-                            No content
+                            {previewMode ? "No content" : "No content"}
                           </div>
                         )}
                       </div>

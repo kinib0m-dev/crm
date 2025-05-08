@@ -26,36 +26,33 @@ export const emailTemplateRouter = createTRPCRouter({
       try {
         const userId = ctx.userId as string;
 
-        // Start a transaction to ensure all operations succeed or fail together
-        return await db.transaction(async (tx) => {
-          // 1. Insert the new template
-          const [newTemplate] = await tx
-            .insert(emailTemplates)
-            .values({
-              userId,
-              name: input.name,
-              subject: input.subject,
-              content: input.content,
-              description: input.description,
-            })
-            .returning();
+        // 1. Insert the new template
+        const [newTemplate] = await db
+          .insert(emailTemplates)
+          .values({
+            userId,
+            name: input.name,
+            subject: input.subject,
+            content: input.content,
+            description: input.description,
+          })
+          .returning();
 
-          // 2. Insert the target statuses
-          const statusValues = input.targetStatuses.map((status) => ({
-            templateId: newTemplate.id,
-            status,
-          }));
+        // 2. Insert the target statuses
+        const statusValues = input.targetStatuses.map((status) => ({
+          templateId: newTemplate.id,
+          status,
+        }));
 
-          await tx.insert(emailTemplateStatuses).values(statusValues);
+        await db.insert(emailTemplateStatuses).values(statusValues);
 
-          return {
-            success: true,
-            template: {
-              ...newTemplate,
-              targetStatuses: input.targetStatuses,
-            },
-          };
-        });
+        return {
+          success: true,
+          template: {
+            ...newTemplate,
+            targetStatuses: input.targetStatuses,
+          },
+        };
       } catch (error) {
         console.error("Error creating email template:", error);
         throw new TRPCError({
@@ -132,8 +129,7 @@ export const emailTemplateRouter = createTRPCRouter({
         const userId = ctx.userId as string;
         const { id, targetStatuses, ...updateData } = input;
 
-        // Check if template exists and belongs to the user
-        const existingTemplateResult = await db
+        const existing = await db
           .select()
           .from(emailTemplates)
           .where(
@@ -141,54 +137,46 @@ export const emailTemplateRouter = createTRPCRouter({
           )
           .limit(1);
 
-        if (!existingTemplateResult[0]) {
+        if (!existing[0]) {
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Email template not found",
           });
         }
 
-        // Start a transaction
-        return await db.transaction(async (tx) => {
-          // 1. Update the template
-          const [updatedTemplate] = await tx
-            .update(emailTemplates)
-            .set({
-              ...updateData,
-              updatedAt: new Date(),
-            })
-            .where(
-              and(eq(emailTemplates.id, id), eq(emailTemplates.userId, userId))
-            )
-            .returning();
+        // 1. Update template
+        const [updatedTemplate] = await db
+          .update(emailTemplates)
+          .set({ ...updateData, updatedAt: new Date() })
+          .where(
+            and(eq(emailTemplates.id, id), eq(emailTemplates.userId, userId))
+          )
+          .returning();
 
-          // 2. Delete existing target statuses
-          await tx
-            .delete(emailTemplateStatuses)
-            .where(eq(emailTemplateStatuses.templateId, id));
+        // 2. Delete previous statuses
+        await db
+          .delete(emailTemplateStatuses)
+          .where(eq(emailTemplateStatuses.templateId, id));
 
-          // 3. Insert new target statuses
-          const statusValues = targetStatuses.map((status) => ({
-            templateId: id,
-            status,
-          }));
+        // 3. Insert new ones
+        const statusValues = targetStatuses.map((status) => ({
+          templateId: id,
+          status,
+        }));
 
-          await tx.insert(emailTemplateStatuses).values(statusValues);
+        await db.insert(emailTemplateStatuses).values(statusValues);
 
-          return {
-            success: true,
-            template: {
-              ...updatedTemplate,
-              targetStatuses,
-            },
-          };
-        });
+        return {
+          success: true,
+          template: {
+            ...updatedTemplate,
+            targetStatuses,
+          },
+        };
       } catch (error) {
         console.error("Error updating email template:", error);
 
-        if (error instanceof TRPCError) {
-          throw error;
-        }
+        if (error instanceof TRPCError) throw error;
 
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -263,7 +251,7 @@ export const emailTemplateRouter = createTRPCRouter({
         const offset = (page - 1) * limit;
 
         // Start building the base query conditions
-        let queryConditions = eq(emailTemplates.userId, userId);
+        let queryConditions = and(eq(emailTemplates.userId, userId));
 
         // Apply search filter if provided
         if (search) {

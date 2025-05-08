@@ -5,15 +5,7 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { useEmailHistory } from "@/hooks/use-email-templates";
 import { LeadPagination } from "@/components/app/leads/LeadPagination";
-
-import {
-  ArrowLeft,
-  MailOpen,
-  Calendar,
-  Users,
-  ExternalLink,
-  Search,
-} from "lucide-react";
+import { MailOpen, Calendar, Users, ExternalLink, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -39,7 +31,7 @@ type EmailHistoryEntry = {
   subject: string;
   sentAt: Date;
   sentCount: number;
-  templateName: string;
+  templateName: string | null;
 };
 
 type EmailHistoryViewProps = {
@@ -71,7 +63,7 @@ export function EmailHistoryView({
     ? displayHistory.filter(
         (entry) =>
           entry.templateName
-            .toLowerCase()
+            ?.toLowerCase()
             .includes(searchQuery.toLowerCase()) ||
           entry.subject.toLowerCase().includes(searchQuery.toLowerCase())
       )
@@ -93,12 +85,6 @@ export function EmailHistoryView({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" asChild>
-            <Link href="/emails">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="sr-only">Back to email templates</span>
-            </Link>
-          </Button>
           <h1 className="text-2xl font-bold">Email History</h1>
         </div>
 
@@ -168,7 +154,7 @@ export function EmailHistoryView({
                             href={`/emails/${entry.templateId}`}
                             className="hover:underline text-primary"
                           >
-                            {entry.templateName}
+                            {entry.templateName || "Unnamed Template"}
                           </Link>
                         </TableCell>
                         <TableCell

@@ -191,11 +191,11 @@ export function ManualLeadForm() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="1">1 - Very Low</SelectItem>
-                        <SelectItem value="2">2 - Low</SelectItem>
+                        <SelectItem value="1">1 - Very High</SelectItem>
+                        <SelectItem value="2">2 - High</SelectItem>
                         <SelectItem value="3">3 - Medium</SelectItem>
-                        <SelectItem value="4">4 - High</SelectItem>
-                        <SelectItem value="5">5 - Very High</SelectItem>
+                        <SelectItem value="4">4 - Low</SelectItem>
+                        <SelectItem value="5">5 - Very Low</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
