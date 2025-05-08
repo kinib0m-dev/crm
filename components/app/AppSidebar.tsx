@@ -9,6 +9,7 @@ import {
   Settings,
   FileSpreadsheet,
   Truck,
+  Puzzle,
 } from "lucide-react";
 import { UserMenu } from "@/components/app/UserMenu";
 import {
@@ -147,6 +148,23 @@ export function AppSidebar({ name, email, image }: UserMenuProps) {
                   <Link href="/bot-docs">
                     <FileSpreadsheet />
                     <span>Bot Docs</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* Playground */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip="Playground"
+                  className={cn({
+                    "bg-primary/90 text-background px-2 py-1 rounded-lg hover:bg-primary/90 hover:text-background":
+                      isActiveRoute("/playground"),
+                  })}
+                >
+                  <Link href="/playground">
+                    <Puzzle />
+                    <span>Playground</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

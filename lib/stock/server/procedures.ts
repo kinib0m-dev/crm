@@ -23,7 +23,15 @@ export const carStockRouter = createTRPCRouter({
         let embedding = null;
         if (input.description) {
           try {
-            embedding = await generateEmbedding(input.description);
+            // Create a comprehensive text to embed
+            const textToEmbed = `
+              Car Name: ${input.name}
+              Type: ${input.type}
+              ${input.price ? `Price: ${input.price}` : ""}
+              ${input.description ? `Description: ${input.description}` : ""}
+              ${input.notes ? `Notes: ${input.notes}` : ""}
+            `;
+            embedding = await generateEmbedding(textToEmbed);
           } catch (embeddingError) {
             console.error(
               "Error generating embedding, continuing without it:",
@@ -41,7 +49,7 @@ export const carStockRouter = createTRPCRouter({
             type: input.type,
             description: input.description,
             price: input.price,
-            imageUrl: input.imageUrl,
+            imageUrl: input.imageUrls,
             url: input.url,
             notes: input.notes,
             embedding: embedding,
@@ -129,11 +137,23 @@ export const carStockRouter = createTRPCRouter({
         // If description has changed, regenerate the embedding
         let embeddingUpdate = {};
 
-        if (updateData.description !== existingCarStock.description) {
+        if (
+          updateData.name !== existingCarStock.name ||
+          updateData.type !== existingCarStock.type ||
+          updateData.description !== existingCarStock.description ||
+          updateData.price !== existingCarStock.price ||
+          updateData.notes !== existingCarStock.notes
+        ) {
           try {
-            const newEmbedding = updateData.description
-              ? await generateEmbedding(updateData.description)
-              : null;
+            // Create a comprehensive text to embed
+            const textToEmbed = `
+              Car Name: ${updateData.name}
+              Type: ${updateData.type}
+              ${updateData.price ? `Price: ${updateData.price}` : ""}
+              ${updateData.description ? `Description: ${updateData.description}` : ""}
+              ${updateData.notes ? `Notes: ${updateData.notes}` : ""}
+            `;
+            const newEmbedding = await generateEmbedding(textToEmbed);
             embeddingUpdate = { embedding: newEmbedding };
           } catch (embeddingError) {
             console.error(

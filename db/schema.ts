@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   timestamp,
   pgTable,
@@ -319,4 +320,30 @@ export const carStock = pgTable("car_stock", {
   isDeleted: boolean("is_deleted").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// -------------------------------------- PLAYGROUND --------------------------------------
+export function pgvector(tableName: string, columnName: string) {
+  return sql`1 - (${tableName}.${columnName} <=> ${columnName})`;
+}
+
+export const botConversations = pgTable("bot_conversations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const botMessages = pgTable("bot_messages", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  conversationId: uuid("conversation_id")
+    .notNull()
+    .references(() => botConversations.id, { onDelete: "cascade" }),
+  role: text("role").notNull(), // 'user' or 'assistant'
+  content: text("content").notNull(),
+  embedding: vector(768)("vector"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
