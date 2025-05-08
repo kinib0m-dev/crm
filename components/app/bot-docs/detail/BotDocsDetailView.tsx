@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -55,7 +54,6 @@ interface BotDocumentDetailViewProps {
 export function BotDocumentDetailView({
   document,
 }: BotDocumentDetailViewProps) {
-  const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { deleteDocument, isLoading: isDeleting } = useDeleteBotDocument();
 
@@ -98,7 +96,6 @@ export function BotDocumentDetailView({
   const handleDelete = async () => {
     try {
       await deleteDocument(document.id);
-      router.push("/bot-docs");
       toast.success("Document deleted successfully");
     } catch (error) {
       console.error("Error deleting document:", error);

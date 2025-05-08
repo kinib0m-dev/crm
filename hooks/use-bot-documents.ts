@@ -182,6 +182,7 @@ export function useDeleteBotDocument() {
   const mutation = trpc.botDocument.delete.useMutation({
     onSuccess: () => {
       utils.botDocument.list.invalidate();
+      router.push("/bot-docs");
       router.refresh();
     },
     onError: (error) => {

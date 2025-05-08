@@ -8,7 +8,12 @@ export default async function BotDocumentDetailPage({
 }) {
   const { id } = await params;
 
-  void trpc.botDocument.getById.prefetch({ id });
+  try {
+    await trpc.botDocument.getById.prefetch({ id });
+  } catch (error) {
+    console.error("Error prefetching document:", error);
+  }
+
   return (
     <HydrateClient>
       <BotDocumentDetailLayout id={id} />
