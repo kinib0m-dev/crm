@@ -216,6 +216,30 @@ export const leadSources = pgTable("lead_sources", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const tags = pgTable("tags", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  color: text("color").default("#cccccc"),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const leadTags = pgTable(
+  "lead_tags",
+  {
+    leadId: uuid("lead_id")
+      .notNull()
+      .references(() => leads.id, { onDelete: "cascade" }),
+    tagId: uuid("tag_id")
+      .notNull()
+      .references(() => tags.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.leadId, t.tagId] }),
+  })
+);
+
 // -------------------------------------- BOT DOCS --------------------------------------
 export const documentCategoryEnum = pgEnum("document_category", [
   "company_profile",

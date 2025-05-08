@@ -6,8 +6,6 @@ import {
   LayoutDashboard,
   Users,
   Mail,
-  MessageSquare,
-  GitBranch,
   Settings,
   FileSpreadsheet,
   Truck,
@@ -102,23 +100,6 @@ export function AppSidebar({ name, email, image }: UserMenuProps) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              {/* Messages */}
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  tooltip="Messages"
-                  className={cn({
-                    "bg-primary/90 text-background px-2 py-1 rounded-lg hover:bg-primary/90 hover:text-background":
-                      isActiveRoute("/messages"),
-                  })}
-                >
-                  <Link href="/messages">
-                    <MessageSquare />
-                    <span>Messages</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
               {/* Emails */}
               <SidebarMenuItem>
                 <SidebarMenuButton
@@ -132,23 +113,6 @@ export function AppSidebar({ name, email, image }: UserMenuProps) {
                   <Link href="/emails">
                     <Mail />
                     <span>Emails</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              {/* Sequences */}
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  tooltip="Sequences"
-                  className={cn({
-                    "bg-primary/90 text-background px-2 py-1 rounded-lg hover:bg-primary/90 hover:text-background":
-                      isActiveRoute("/sequences"),
-                  })}
-                >
-                  <Link href="/sequences">
-                    <GitBranch />
-                    <span>Sequences</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
