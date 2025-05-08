@@ -124,3 +124,12 @@ type LeadStats = {
 };
 
 // -------------------------------------------  -------------------------------------------
+
+type LeadNotes = {
+  id: string;
+  leadId: string;
+  userId: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+};

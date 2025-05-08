@@ -347,3 +347,18 @@ export const botMessages = pgTable("bot_messages", {
   embedding: vector(768)("vector"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// -------------------------------------- LEAD NOTES --------------------------------------
+// Lead notes table for storing notes related to leads
+export const leadNotes = pgTable("lead_notes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  leadId: uuid("lead_id")
+    .notNull()
+    .references(() => leads.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});

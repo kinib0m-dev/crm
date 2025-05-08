@@ -48,6 +48,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { NotesPreview } from "../notes/NotesPreview";
 
 interface LeadsDetailViewProps {
   lead: LeadWithTags;
@@ -505,27 +506,7 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
             </Button>
           </div>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <FileUp className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                <h3 className="text-lg font-medium mb-2">No notes recorded</h3>
-                <p className="text-muted-foreground max-w-md">
-                  Keep important information and context about this lead by
-                  adding notes.
-                </p>
-                <Button className="mt-4" asChild>
-                  <Link
-                    href={`/leads/${lead.id}/notes`}
-                    className="flex items-center gap-1"
-                  >
-                    <PlusCircle className="h-4 w-4 mr-2" />
-                    Add First Note
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <NotesPreview leadId={lead.id} />
         </TabsContent>
 
         {/* Emails Tab */}
