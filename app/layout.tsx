@@ -23,8 +23,8 @@ const sourceSans3 = Source_Sans_3({
 export const metadata: Metadata = {
   metadataBase: new URL("https://domain"),
   title: {
-    default: "default title",
-    template: `%s | sitename`,
+    default: "CRM",
+    template: `%s | CRM`,
   },
   description: "Description",
   keywords: [],
@@ -32,11 +32,11 @@ export const metadata: Metadata = {
     icon: "/icon.png",
   },
   openGraph: {
-    title: "Title",
+    title: "CRM",
     description: "Description",
     images: [""],
     url: "https://domain",
-    siteName: "Site name",
+    siteName: "CRM",
   },
 };
 
