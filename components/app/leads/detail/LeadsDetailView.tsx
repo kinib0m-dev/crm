@@ -50,6 +50,7 @@ import {
 } from "@/components/ui/dialog";
 import { NotesPreview } from "../notes/NotesPreview";
 import { TasksPreview } from "../tasks/TaskPreview";
+import { LeadSendEmail } from "../email/LeadsSendEmail";
 
 interface LeadsDetailViewProps {
   lead: LeadWithTags;
@@ -494,38 +495,13 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
         <TabsContent value="emails">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold">Emails</h3>
-            <Button asChild>
-              <Link
-                href={`/leads/${lead.id}/emails`}
-                className="flex items-center gap-1"
-              >
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Send Email
-              </Link>
-            </Button>
           </div>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <FileUp className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                <h3 className="text-lg font-medium mb-2">No emails sent</h3>
-                <p className="text-muted-foreground max-w-md">
-                  Send and track emails to communicate with this lead directly
-                  from the CRM.
-                </p>
-                <Button className="mt-4" asChild>
-                  <Link
-                    href={`/leads/${lead.id}/emails`}
-                    className="flex items-center gap-1"
-                  >
-                    <PlusCircle className="h-4 w-4 mr-2" />
-                    Compose Email
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <LeadSendEmail
+            leadId={lead.id}
+            leadName={lead.name}
+            leadEmail={lead.email}
+          />
         </TabsContent>
       </Tabs>
     </div>
