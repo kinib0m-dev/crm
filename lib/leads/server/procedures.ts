@@ -18,7 +18,6 @@ export const leadRouter = createTRPCRouter({
       try {
         const userId = ctx.userId as string;
 
-        // Ensure the data passed matches the expected types (e.g., converting number to string if necessary)
         const leadData = {
           userId,
           ...input,
@@ -376,66 +375,4 @@ export const leadRouter = createTRPCRouter({
         });
       }
     }),
-  /*
-  // Get lead statistics
-  getStats: protectedProcedure.query(async ({ ctx }) => {
-    try {
-      const userId = ctx.userId as string;
-
-      // Count leads by status
-      const leadsByStatus = await db
-        .select({
-          status: leads.status,
-          count: sql<number>`count(*)`,
-        })
-        .from(leads)
-        .where(and(eq(leads.userId, userId), eq(leads.isDeleted, false)))
-        .groupBy(leads.status);
-
-      // Count leads by priority
-      const leadsByPriority = await db
-        .select({
-          priority: leads.priority,
-          count: sql<number>`count(*)`,
-        })
-        .from(leads)
-        .where(and(eq(leads.userId, userId), eq(leads.isDeleted, false)))
-        .groupBy(leads.priority);
-
-      // Count leads by timeframe
-      const leadsByTimeframe = await db
-        .select({
-          timeframe: leads.expectedPurchaseTimeframe,
-          count: sql<number>`count(*)`,
-        })
-        .from(leads)
-        .where(and(eq(leads.userId, userId), eq(leads.isDeleted, false)))
-        .groupBy(leads.expectedPurchaseTimeframe);
-
-      // Get total count of leads
-      const totalLeadsResult = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(leads)
-        .where(and(eq(leads.userId, userId), eq(leads.isDeleted, false)));
-
-      const totalLeads = Number(totalLeadsResult[0]?.count) || 0;
-
-      return {
-        success: true,
-        stats: {
-          total: totalLeads,
-          byStatus: leadsByStatus,
-          byPriority: leadsByPriority,
-          byTimeframe: leadsByTimeframe,
-        },
-      };
-    } catch (error) {
-      console.error("Error getting lead statistics:", error);
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to get lead statistics",
-      });
-    }
-  }),
-  */
 });
