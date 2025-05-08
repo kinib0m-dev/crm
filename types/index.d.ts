@@ -133,3 +133,41 @@ type LeadNotes = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+type LeadTasks = {
+  id: string;
+  leadId: string;
+  status: "pending" | "in_progress" | "completed" | "cancelled";
+  priority: "low" | "medium" | "high" | "urgent";
+  title: string;
+  description?: string | undefined;
+  dueDate?: string | undefined;
+};
+
+type ExtendedLeadTasks = {
+  id: string;
+  leadId: string;
+  userId: string;
+  title: string;
+  description: string | null;
+  priority: "low" | "medium" | "high" | "urgent";
+  status: "pending" | "in_progress" | "completed" | "cancelled";
+  dueDate: Date | null;
+  completedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type ExtendedLeadTasksString = {
+  id: string;
+  leadId: string;
+  userId: string;
+  title: string;
+  description: string | null;
+  priority: "low" | "medium" | "high" | "urgent";
+  status: "pending" | "in_progress" | "completed" | "cancelled";
+  dueDate: string | null;
+  completedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};

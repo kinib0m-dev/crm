@@ -92,3 +92,7 @@ type CarTypes =
   | "luxury"
   | "sports"
   | "other";
+
+type LeadTaskStatus = "pending" | "in_progress" | "completed" | "cancelled";
+
+type LeadTaskPriority = "low" | "medium" | "high" | "urgent";

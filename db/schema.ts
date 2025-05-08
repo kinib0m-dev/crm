@@ -241,6 +241,57 @@ export const leadTags = pgTable(
   })
 );
 
+// -------------------------------------- LEAD NOTES --------------------------------------
+// Lead notes table for storing notes related to leads
+export const leadNotes = pgTable("lead_notes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  leadId: uuid("lead_id")
+    .notNull()
+    .references(() => leads.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// -------------------------------------- LEAD TASKS --------------------------------------
+// Lead task priority enum
+export const taskPriorityEnum = pgEnum("task_priority", [
+  "low",
+  "medium",
+  "high",
+  "urgent",
+]);
+
+// Lead task status enum
+export const taskStatusEnum = pgEnum("task_status", [
+  "pending",
+  "in_progress",
+  "completed",
+  "cancelled",
+]);
+
+// Lead tasks table for storing tasks related to leads
+export const leadTasks = pgTable("lead_tasks", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  leadId: uuid("lead_id")
+    .notNull()
+    .references(() => leads.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description"),
+  priority: taskPriorityEnum("priority").default("medium").notNull(),
+  status: taskStatusEnum("status").default("pending").notNull(),
+  dueDate: timestamp("due_date", { mode: "date" }),
+  completedAt: timestamp("completed_at", { mode: "date" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // -------------------------------------- BOT DOCS --------------------------------------
 export const documentCategoryEnum = pgEnum("document_category", [
   "company_profile",
@@ -346,19 +397,4 @@ export const botMessages = pgTable("bot_messages", {
   content: text("content").notNull(),
   embedding: vector(768)("vector"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// -------------------------------------- LEAD NOTES --------------------------------------
-// Lead notes table for storing notes related to leads
-export const leadNotes = pgTable("lead_notes", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  leadId: uuid("lead_id")
-    .notNull()
-    .references(() => leads.id, { onDelete: "cascade" }),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  content: text("content").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
