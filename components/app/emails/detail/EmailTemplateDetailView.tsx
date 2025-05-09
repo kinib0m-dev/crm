@@ -1,4 +1,3 @@
-// components/app/emails/detail/EmailTemplateDetailView.tsx
 "use client";
 
 import { useState } from "react";
@@ -48,6 +47,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type EmailTemplate = {
   id: string;
@@ -71,6 +71,7 @@ export function EmailTemplateDetailView({
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
+  const [sendToAllLeads, setSendToAllLeads] = useState(false);
   const { deleteTemplate, isLoading: isDeleting } = useDeleteEmailTemplate();
   const { sendEmails, isLoading: isSending } = useSendEmails();
   const { count: targetLeadCount, isLoading: isCountLoading } =
@@ -130,10 +131,12 @@ export function EmailTemplateDetailView({
     try {
       const result = await sendEmails({
         templateId: template.id,
-        sendToAll: true,
+        sendToAll: sendToAllLeads, // FIXED: Use the checkbox state instead of hardcoded true
       });
       setIsSendDialogOpen(false);
+      setSendToAllLeads(false); // Reset for next time
       console.log(result);
+      toast.success(`Email sent to ${result.sentCount} recipients`);
       router.refresh();
     } catch (error) {
       console.error("Error sending emails:", error);
@@ -365,11 +368,19 @@ export function EmailTemplateDetailView({
               </div>
             </div>
 
-            <Dialog open={isSendDialogOpen} onOpenChange={setIsSendDialogOpen}>
+            <Dialog
+              open={isSendDialogOpen}
+              onOpenChange={(open) => {
+                setIsSendDialogOpen(open);
+                if (!open) setSendToAllLeads(false); // Reset when closing
+              }}
+            >
               <DialogTrigger asChild>
                 <Button
                   disabled={
-                    targetLeadCount === 0 || isCountLoading || isSending
+                    (targetLeadCount === 0 && !sendToAllLeads) ||
+                    isCountLoading ||
+                    isSending
                   }
                 >
                   <Send className="h-4 w-4 mr-2" />
@@ -380,8 +391,8 @@ export function EmailTemplateDetailView({
                 <DialogHeader>
                   <DialogTitle>Confirm Email Send</DialogTitle>
                   <DialogDescription>
-                    Are you sure you want to send this email to all matching
-                    leads now?
+                    Are you sure you want to send this email to the selected
+                    recipients?
                   </DialogDescription>
                 </DialogHeader>
 
@@ -394,20 +405,48 @@ export function EmailTemplateDetailView({
                     <h4 className="text-sm font-medium mb-1">Subject:</h4>
                     <p className="text-sm">{template.subject}</p>
                   </div>
+
+                  {/* Add checkbox for sendToAll option */}
+                  <div className="flex items-center space-x-2 pt-2 border-t">
+                    <Checkbox
+                      id="sendToAllLeads"
+                      checked={sendToAllLeads}
+                      onCheckedChange={(checked) =>
+                        setSendToAllLeads(checked === true)
+                      }
+                    />
+                    <div>
+                      <label
+                        htmlFor="sendToAllLeads"
+                        className="text-sm font-medium cursor-pointer"
+                      >
+                        Send to all leads
+                      </label>
+                      <p className="text-xs text-muted-foreground">
+                        When checked, emails will be sent to all leads
+                        regardless of template status filters
+                      </p>
+                    </div>
+                  </div>
+
                   <div>
                     <h4 className="text-sm font-medium mb-1">Recipients:</h4>
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">
-                        {targetLeadCount === 0 ? (
+                        {targetLeadCount === 0 && !sendToAllLeads ? (
                           <span className="text-amber-600">
                             No matching leads with email addresses found
                           </span>
                         ) : (
                           <span>
                             This email will be sent to{" "}
-                            <strong>{targetLeadCount}</strong> lead
-                            {targetLeadCount !== 1 ? "s" : ""}
+                            <strong>
+                              {sendToAllLeads ? "all" : targetLeadCount}
+                            </strong>{" "}
+                            lead
+                            {sendToAllLeads || targetLeadCount !== 1 ? "s" : ""}
+                            {sendToAllLeads && " (ignoring status filters)"}
                           </span>
                         )}
                       </span>
@@ -418,14 +457,19 @@ export function EmailTemplateDetailView({
                 <DialogFooter>
                   <Button
                     variant="outline"
-                    onClick={() => setIsSendDialogOpen(false)}
+                    onClick={() => {
+                      setIsSendDialogOpen(false);
+                      setSendToAllLeads(false);
+                    }}
                     disabled={isSending}
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleSendEmails}
-                    disabled={isSending || targetLeadCount === 0}
+                    disabled={
+                      isSending || (targetLeadCount === 0 && !sendToAllLeads)
+                    }
                   >
                     {isSending ? (
                       <>

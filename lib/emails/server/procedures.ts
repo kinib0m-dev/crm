@@ -440,10 +440,37 @@ export const emailTemplateRouter = createTRPCRouter({
           });
         }
 
+        // Get template's target statuses
+        const statusesResult = await db
+          .select({
+            status: emailTemplateStatuses.status,
+          })
+          .from(emailTemplateStatuses)
+          .where(eq(emailTemplateStatuses.templateId, templateId));
+
+        const targetStatuses = statusesResult.map((row) => row.status);
+
+        // We will process leads differently depending on whether specific leads were selected
         let leadIds: string[] = [];
+        let leadsData = [];
 
         if (specificLeadIds && specificLeadIds.length > 0) {
-          // Use specific lead IDs
+          // Case 1: User selected specific leads
+          // Basic conditions that always apply
+          const specificLeadsConditions = [
+            eq(leads.userId, userId),
+            eq(leads.isDeleted, false),
+            inArray(leads.id, specificLeadIds),
+            sql`${leads.email} IS NOT NULL AND ${leads.email} != ''`,
+          ];
+
+          // Apply status filtering only if:
+          // 1. User is NOT sending to all leads, AND
+          // 2. The template has target statuses defined
+          if (!sendToAll && targetStatuses.length > 0) {
+            specificLeadsConditions.push(inArray(leads.status, targetStatuses));
+          }
+
           const specificLeadsResult = await db
             .select({
               id: leads.id,
@@ -451,73 +478,26 @@ export const emailTemplateRouter = createTRPCRouter({
               name: leads.name,
             })
             .from(leads)
-            .where(
-              and(
-                eq(leads.userId, userId),
-                eq(leads.isDeleted, false),
-                inArray(leads.id, specificLeadIds),
-                sql`${leads.email} IS NOT NULL AND ${leads.email} != ''`
-              )
-            );
+            .where(and(...specificLeadsConditions));
 
           leadIds = specificLeadsResult.map((lead) => lead.id);
-
-          const sentCount = await sendEmailToLeads({
-            userId,
-            template,
-            leadsData: specificLeadsResult,
-          });
-
-          const [emailHistoryEntry] = await db
-            .insert(emailHistory)
-            .values({
-              userId,
-              templateId,
-              subject: template.subject,
-              sentCount,
-            })
-            .returning();
-
-          if (leadIds.length > 0) {
-            await db.insert(emailHistoryLeads).values(
-              leadIds.map((leadId) => ({
-                historyId: emailHistoryEntry.id,
-                leadId,
-              }))
-            );
-          }
-
-          return {
-            success: true,
-            sentCount,
-          };
+          leadsData = specificLeadsResult;
         } else {
-          // Get template's target statuses if sending to matching leads
-          let targetStatuses: string[] = [];
-
-          if (sendToAll) {
-            const statusesResult = await db
-              .select({
-                status: emailTemplateStatuses.status,
-              })
-              .from(emailTemplateStatuses)
-              .where(eq(emailTemplateStatuses.templateId, templateId));
-
-            targetStatuses = statusesResult.map((row) => row.status);
-          }
-
+          // Case 2: Sending based on template's target statuses or to all leads
+          // Basic conditions that always apply
           const conditions = [
             eq(leads.userId, userId),
             eq(leads.isDeleted, false),
             sql`${leads.email} IS NOT NULL AND ${leads.email} != ''`,
           ];
 
+          // Apply status filtering only if:
+          // 1. Not sending to all leads AND we have target statuses defined
           if (!sendToAll && targetStatuses.length > 0) {
-            conditions.push(
-              inArray(leads.status, targetStatuses as LeadStatus[])
-            );
+            conditions.push(inArray(leads.status, targetStatuses));
           }
 
+          // Execute the query with the final conditions
           const targetLeads = await db
             .select({
               id: leads.id,
@@ -528,49 +508,52 @@ export const emailTemplateRouter = createTRPCRouter({
             .where(and(...conditions));
 
           leadIds = targetLeads.map((lead) => lead.id);
+          leadsData = targetLeads;
+        }
 
-          if (leadIds.length === 0) {
-            return {
-              success: true,
-              sentCount: 0,
-            };
-          }
-
-          const sentCount = await sendEmailToLeads({
-            userId,
-            template,
-            leadsData: targetLeads,
-          });
-
-          const [emailHistoryEntry] = await db
-            .insert(emailHistory)
-            .values({
-              userId,
-              templateId,
-              subject: template.subject,
-              sentCount,
-            })
-            .returning();
-
-          if (leadIds.length > 0) {
-            await db.insert(emailHistoryLeads).values(
-              leadIds.map((leadId) => ({
-                historyId: emailHistoryEntry.id,
-                leadId,
-              }))
-            );
-          }
-
+        if (leadIds.length === 0) {
           return {
             success: true,
-            sentCount,
+            message: "No matching leads found with valid email addresses",
+            sentCount: 0,
           };
         }
+
+        const sentCount = await sendEmailToLeads({
+          userId,
+          template,
+          leadsData,
+        });
+
+        const [emailHistoryEntry] = await db
+          .insert(emailHistory)
+          .values({
+            userId,
+            templateId,
+            subject: template.subject,
+            sentCount,
+          })
+          .returning();
+
+        if (leadIds.length > 0) {
+          await db.insert(emailHistoryLeads).values(
+            leadIds.map((leadId) => ({
+              historyId: emailHistoryEntry.id,
+              leadId,
+            }))
+          );
+        }
+
+        return {
+          success: true,
+          sentCount,
+          message: `Successfully sent ${sentCount} emails`,
+        };
       } catch (error) {
         console.error("Error sending emails:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to send emails",
+          message: `Failed to send emails: ${error instanceof Error ? error.message : "Unknown error"}`,
         });
       }
     }),

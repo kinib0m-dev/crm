@@ -1,4 +1,3 @@
-// components/app/emails/EmailTemplateTable.tsx
 "use client";
 
 import {
@@ -36,6 +35,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type EmailTemplate = {
   id: string;
@@ -64,6 +64,7 @@ export function EmailTemplateTable({
 }: EmailTemplateTableProps) {
   const [confirmSendTemplate, setConfirmSendTemplate] =
     useState<EmailTemplate | null>(null);
+  const [sendToAllLeads, setSendToAllLeads] = useState(false);
   const { sendEmails, isLoading: isSending } = useSendEmails();
 
   const formatStatus = (status: string) => {
@@ -73,25 +74,18 @@ export function EmailTemplateTable({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "new_lead":
-      case "initial_contact":
         return "bg-blue-100 text-blue-800";
-      case "awaiting_response":
-      case "engaged":
-      case "information_gathering":
-        return "bg-emerald-100 text-emerald-800";
-      case "high_interest":
+      case "initial_contact":
+        return "bg-indigo-100 text-indigo-800";
       case "qualified":
-      case "appointment_scheduled":
         return "bg-purple-100 text-purple-800";
-      case "proposal_sent":
-      case "negotiation":
-        return "bg-amber-100 text-amber-800";
+      case "high_interest":
+        return "bg-violet-100 text-violet-800";
       case "converted":
         return "bg-green-100 text-green-800";
-      case "future_opportunity":
+      case "proposal_sent":
+        return "bg-amber-100 text-amber-800";
       case "periodic_nurture":
-      case "reactivated":
-        return "bg-indigo-100 text-indigo-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -118,9 +112,10 @@ export function EmailTemplateTable({
     try {
       await sendEmails({
         templateId: confirmSendTemplate.id,
-        sendToAll: true,
+        sendToAll: sendToAllLeads,
       });
       setConfirmSendTemplate(null);
+      setSendToAllLeads(false);
     } catch (error) {
       console.error("Failed to send emails:", error);
     }
@@ -175,6 +170,8 @@ export function EmailTemplateTable({
                 key={template.id}
                 template={template}
                 onSendClick={setConfirmSendTemplate}
+                getStatusColor={getStatusColor}
+                formatStatus={formatStatus}
               />
             ))}
           </TableBody>
@@ -184,13 +181,18 @@ export function EmailTemplateTable({
       {/* Confirm Send Dialog */}
       <Dialog
         open={!!confirmSendTemplate}
-        onOpenChange={(open) => !open && setConfirmSendTemplate(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setConfirmSendTemplate(null);
+            setSendToAllLeads(false);
+          }
+        }}
       >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Send Email</DialogTitle>
             <DialogDescription>
-              Are you sure you want to send this email to all matching leads?
+              Choose your email sending options below
             </DialogDescription>
           </DialogHeader>
 
@@ -207,22 +209,57 @@ export function EmailTemplateTable({
               <div>
                 <h4 className="text-sm font-medium mb-1">Target segments:</h4>
                 <div className="flex flex-wrap gap-2">
-                  {confirmSendTemplate.targetStatuses.map((status) => (
-                    <Badge key={status} className={getStatusColor(status)}>
-                      {formatStatus(status)}
-                    </Badge>
-                  ))}
+                  {confirmSendTemplate.targetStatuses.length > 0 ? (
+                    confirmSendTemplate.targetStatuses.map((status) => (
+                      <Badge key={status} className={getStatusColor(status)}>
+                        {formatStatus(status)}
+                      </Badge>
+                    ))
+                  ) : (
+                    <span className="text-xs text-muted-foreground">
+                      No target segments defined
+                    </span>
+                  )}
                 </div>
               </div>
 
-              <TargetLeadsCount templateId={confirmSendTemplate.id} />
+              <TargetLeadsCount
+                templateId={confirmSendTemplate.id}
+                sendToAll={sendToAllLeads}
+              />
+
+              {/* Add checkbox for sendToAll option */}
+              <div className="flex items-center space-x-2 pt-2 border-t">
+                <Checkbox
+                  id="sendToAllLeads"
+                  checked={sendToAllLeads}
+                  onCheckedChange={(checked) =>
+                    setSendToAllLeads(checked === true)
+                  }
+                />
+                <div>
+                  <label
+                    htmlFor="sendToAllLeads"
+                    className="text-sm font-medium cursor-pointer"
+                  >
+                    Send to all leads
+                  </label>
+                  <p className="text-xs text-muted-foreground">
+                    When checked, emails will be sent to all leads regardless of
+                    template status filters
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setConfirmSendTemplate(null)}
+              onClick={() => {
+                setConfirmSendTemplate(null);
+                setSendToAllLeads(false);
+              }}
               disabled={isSending}
             >
               Cancel
@@ -248,9 +285,13 @@ export function EmailTemplateTable({
 function TemplateRow({
   template,
   onSendClick,
+  getStatusColor,
+  formatStatus,
 }: {
   template: EmailTemplate;
   onSendClick: (template: EmailTemplate) => void;
+  getStatusColor: (status: string) => string;
+  formatStatus: (status: string) => string;
 }) {
   return (
     <TableRow className="hover:bg-muted/50 transition-colors">
@@ -272,10 +313,12 @@ function TemplateRow({
           {template.targetStatuses.length > 0 ? (
             <>
               {template.targetStatuses.slice(0, 3).map((status) => (
-                <Badge key={status} className="text-xs" variant="secondary">
-                  {status
-                    .replace(/_/g, " ")
-                    .replace(/\b\w/g, (c) => c.toUpperCase())}
+                <Badge
+                  key={status}
+                  className={`text-xs ${getStatusColor(status)}`}
+                  variant="outline"
+                >
+                  {formatStatus(status)}
                 </Badge>
               ))}
               {template.targetStatuses.length > 3 && (
@@ -330,7 +373,13 @@ function TemplateRow({
 }
 
 // Component to show the count of leads that will receive the email
-function TargetLeadsCount({ templateId }: { templateId: string }) {
+function TargetLeadsCount({
+  templateId,
+  sendToAll = false,
+}: {
+  templateId: string;
+  sendToAll?: boolean;
+}) {
   const { count, isLoading } = useCountTargetLeads(templateId);
 
   if (isLoading) {
@@ -348,14 +397,18 @@ function TargetLeadsCount({ templateId }: { templateId: string }) {
       <div className="flex items-center gap-2">
         <Mail className="h-4 w-4 text-muted-foreground" />
         <span className="text-sm">
-          {count === 0 ? (
+          {count === 0 && !sendToAll ? (
             <span className="text-amber-600">
               No matching leads with email addresses found
             </span>
           ) : (
             <span>
-              This email will be sent to <strong>{count}</strong> lead
-              {count !== 1 ? "s" : ""}
+              This email will be sent to{" "}
+              <strong>{sendToAll ? "all" : count}</strong> lead
+              {sendToAll || count !== 1 ? "s" : ""}
+              {sendToAll
+                ? " (ignoring status filters)"
+                : " matching the target segments"}
             </span>
           )}
         </span>
