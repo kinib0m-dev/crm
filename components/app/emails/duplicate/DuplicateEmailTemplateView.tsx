@@ -403,9 +403,6 @@ export function DuplicateEmailTemplateView({
                               {...field}
                             />
                           </FormControl>
-                          <FormDescription>
-                            You can use HTML formatting in your email content.
-                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}

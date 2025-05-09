@@ -7,6 +7,8 @@ import { botChatRouter } from "@/lib/playground/server/procedures";
 import { leadNoteRouter } from "@/lib/leads/server/notes-procedures";
 import { leadTaskRouter } from "@/lib/leads/server/task-procedures";
 import { emailTemplateRouter } from "@/lib/emails/server/procedures";
+import { facebookRouter } from "@/lib/facebook/server/procedures";
+import { dashboardRouter } from "@/lib/dashboard/server/procedures";
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,
@@ -17,6 +19,8 @@ export const appRouter = createTRPCRouter({
   carStock: carStockRouter,
   botChat: botChatRouter,
   emailTemplate: emailTemplateRouter,
+  dashboard: dashboardRouter,
+  facebook: facebookRouter,
 });
 
 // export type definition of API

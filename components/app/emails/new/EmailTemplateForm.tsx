@@ -354,9 +354,6 @@ export function EmailTemplateForm() {
                             {...field}
                           />
                         </FormControl>
-                        <FormDescription>
-                          You can use HTML formatting in your email content.
-                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -383,7 +380,7 @@ export function EmailTemplateForm() {
                       <div className="text-sm text-muted-foreground mb-1">
                         Content:
                       </div>
-                      {previewFormValues.content && previewMode ? (
+                      {previewFormValues.content ? (
                         <div
                           className="prose max-w-none"
                           dangerouslySetInnerHTML={{
@@ -394,7 +391,7 @@ export function EmailTemplateForm() {
                         />
                       ) : (
                         <div className="text-muted-foreground italic">
-                          No content
+                          {previewMode ? "No content" : "No content"}
                         </div>
                       )}
                     </div>

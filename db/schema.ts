@@ -459,3 +459,52 @@ export const emailHistoryLeads = pgTable(
     pk: primaryKey({ columns: [t.historyId, t.leadId] }),
   })
 );
+
+// -------------------------------------- FACEBOOK --------------------------------------
+/*
+// Facebook Integration
+export const facebookSettings = pgTable("facebook_settings", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  accessToken: text("access_token").notNull(),
+  appSecret: text("app_secret").notNull(),
+  webhookToken: text("webhook_token").notNull(),
+  formIds: text("form_ids").array(),
+  isActive: boolean("is_active").default(true),
+  lastSyncedAt: timestamp("last_synced_at", { mode: "date" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Facebook Lead tracking
+export const facebookLeads = pgTable("facebook_leads", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  leadId: text("lead_id").notNull(),
+  formId: text("form_id").notNull(),
+  crmLeadId: uuid("crm_lead_id").references(() => leads.id),
+  rawData: text("raw_data"), // JSON data of the lead
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  processedAt: timestamp("processed_at", { mode: "date" }),
+});
+
+// Facebook Form tracking
+export const facebookForms = pgTable("facebook_forms", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  formId: text("form_id").notNull(),
+  formName: text("form_name"),
+  pageId: text("page_id"),
+  pageName: text("page_name"),
+  assignToStatus: text("assign_to_status").default("new_lead"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+*/

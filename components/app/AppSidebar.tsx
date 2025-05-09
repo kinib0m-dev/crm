@@ -6,11 +6,12 @@ import {
   LayoutDashboard,
   Users,
   Mail,
-  Settings,
   FileSpreadsheet,
   Truck,
   Puzzle,
   History,
+  Facebook,
+  MessageCircle,
 } from "lucide-react";
 import { UserMenu } from "@/components/app/UserMenu";
 import {
@@ -45,7 +46,8 @@ export function AppSidebar({ name, email, image }: UserMenuProps) {
     if (route === "/emails") {
       return (
         pathname === "/emails" ||
-        (pathname.startsWith("/emails") && pathname !== "/emails/history")
+        (pathname.startsWith("/emails") &&
+          !pathname.startsWith("/emails/history"))
       );
     }
     return pathname.startsWith(route);
@@ -203,15 +205,30 @@ export function AppSidebar({ name, email, image }: UserMenuProps) {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  tooltip="Settings"
+                  tooltip="Facebook"
                   className={cn({
                     "bg-primary/90 text-background px-2 py-1 rounded-lg hover:bg-primary/90 hover:text-background":
-                      isActiveRoute("/settings"),
+                      isActiveRoute("/settings/facebook-integration"),
                   })}
                 >
-                  <Link href="/settings">
-                    <Settings />
-                    <span>Settings</span>
+                  <Link href="/settings/facebook-integration">
+                    <Facebook />
+                    <span>Facebook Integration</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip="WhatsApp"
+                  className={cn({
+                    "bg-primary/90 text-background px-2 py-1 rounded-lg hover:bg-primary/90 hover:text-background":
+                      isActiveRoute("/settings/whatsapp-integration"),
+                  })}
+                >
+                  <Link href="/settings/whatsapp-integration">
+                    <MessageCircle />
+                    <span>WhatsApp Integration</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
