@@ -193,8 +193,8 @@ export const leads = pgTable("leads", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
-  email: text("email"),
-  phone: text("phone"),
+  email: text("email").unique(),
+  phone: text("phone").unique(),
   status: leadStatusEnum("status").default("new_lead").notNull(),
   sourceId: uuid("source_id").references(() => leadSources.id),
   priority: integer("priority").default(3),

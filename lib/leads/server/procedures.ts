@@ -18,6 +18,50 @@ export const leadRouter = createTRPCRouter({
       try {
         const userId = ctx.userId as string;
 
+        // Check if a lead with the same email already exists (if email provided)
+        if (input.email) {
+          const existingByEmail = await db
+            .select()
+            .from(leads)
+            .where(
+              and(
+                eq(leads.userId, userId),
+                eq(leads.email, input.email),
+                eq(leads.isDeleted, false)
+              )
+            )
+            .limit(1);
+
+          if (existingByEmail.length > 0) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "A lead with this email already exists",
+            });
+          }
+        }
+
+        // Check if a lead with the same phone already exists (if phone provided)
+        if (input.phone) {
+          const existingByPhone = await db
+            .select()
+            .from(leads)
+            .where(
+              and(
+                eq(leads.userId, userId),
+                eq(leads.phone, input.phone),
+                eq(leads.isDeleted, false)
+              )
+            )
+            .limit(1);
+
+          if (existingByPhone.length > 0) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "A lead with this phone number already exists",
+            });
+          }
+        }
+
         const leadData = {
           userId,
           ...input,
@@ -32,6 +76,30 @@ export const leadRouter = createTRPCRouter({
         };
       } catch (error) {
         console.error("Error creating lead:", error);
+
+        // Check for unique constraint violation
+        if (error instanceof TRPCError) {
+          throw error;
+        }
+
+        // Handle database-level unique violations
+        if (
+          error instanceof Error &&
+          error.message.includes("unique constraint")
+        ) {
+          if (error.message.toLowerCase().includes("email")) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "A lead with this email already exists",
+            });
+          } else if (error.message.toLowerCase().includes("phone")) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "A lead with this phone number already exists",
+            });
+          }
+        }
+
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to create lead",
@@ -119,6 +187,52 @@ export const leadRouter = createTRPCRouter({
           });
         }
 
+        // Check for duplicate email (if changing email)
+        if (updateData.email && updateData.email !== existingLead.email) {
+          const existingByEmail = await db
+            .select()
+            .from(leads)
+            .where(
+              and(
+                eq(leads.userId, userId),
+                eq(leads.email, updateData.email),
+                eq(leads.isDeleted, false),
+                sql`${leads.id} != ${id}` // Exclude current lead
+              )
+            )
+            .limit(1);
+
+          if (existingByEmail.length > 0) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "A lead with this email already exists",
+            });
+          }
+        }
+
+        // Check for duplicate phone (if changing phone)
+        if (updateData.phone && updateData.phone !== existingLead.phone) {
+          const existingByPhone = await db
+            .select()
+            .from(leads)
+            .where(
+              and(
+                eq(leads.userId, userId),
+                eq(leads.phone, updateData.phone),
+                eq(leads.isDeleted, false),
+                sql`${leads.id} != ${id}` // Exclude current lead
+              )
+            )
+            .limit(1);
+
+          if (existingByPhone.length > 0) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "A lead with this phone number already exists",
+            });
+          }
+        }
+
         // Update the lead
         const [updatedLead] = await db
           .update(leads)
@@ -138,6 +252,24 @@ export const leadRouter = createTRPCRouter({
 
         if (error instanceof TRPCError) {
           throw error;
+        }
+
+        // Handle database-level unique violations
+        if (
+          error instanceof Error &&
+          error.message.includes("unique constraint")
+        ) {
+          if (error.message.toLowerCase().includes("email")) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "A lead with this email already exists",
+            });
+          } else if (error.message.toLowerCase().includes("phone")) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "A lead with this phone number already exists",
+            });
+          }
         }
 
         throw new TRPCError({

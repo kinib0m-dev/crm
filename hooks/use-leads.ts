@@ -78,7 +78,7 @@ export function useLeadList(initialFilters: Partial<FilterLeadSchema> = {}) {
 }
 
 /**
- * Hook for lead creation
+ * Hook for lead creation with duplicate handling
  */
 export function useCreateLead() {
   const utils = trpc.useUtils();
@@ -88,10 +88,18 @@ export function useCreateLead() {
     onSuccess: () => {
       // Invalidate queries to refetch lead list
       utils.lead.list.invalidate();
+      toast.success("Lead created successfully");
       router.refresh();
     },
     onError: (error) => {
-      toast.error(`Error creating lead: ${error.message}`);
+      // Handle specific error messages for unique constraint violations
+      if (error.message.includes("email already exists")) {
+        toast.error("A lead with this email address already exists");
+      } else if (error.message.includes("phone number already exists")) {
+        toast.error("A lead with this phone number already exists");
+      } else {
+        toast.error(`Error creating lead: ${error.message}`);
+      }
     },
   });
 
@@ -137,7 +145,7 @@ export function useLead(id: string) {
 }
 
 /**
- * Hook for updating a lead
+ * Hook for updating a lead with duplicate handling
  */
 export function useUpdateLead() {
   const utils = trpc.useUtils();
@@ -152,7 +160,14 @@ export function useUpdateLead() {
       router.refresh();
     },
     onError: (error) => {
-      toast.error(`Error updating lead: ${error.message}`);
+      // Handle specific error messages for unique constraint violations
+      if (error.message.includes("email already exists")) {
+        toast.error("A lead with this email address already exists");
+      } else if (error.message.includes("phone number already exists")) {
+        toast.error("A lead with this phone number already exists");
+      } else {
+        toast.error(`Error updating lead: ${error.message}`);
+      }
     },
   });
 
@@ -205,59 +220,4 @@ export function useDeleteLead() {
   };
 }
 
-/*
-export function useLeadStats() {
-  const { data, isLoading, isError, error, refetch } =
-    trpc.lead.getStats.useQuery(undefined, {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    });
-
-  // Process the stats for easier consumption
-  const processedStats = useMemo(() => {
-    if (!data?.stats) return null;
-
-    return {
-      total: data.stats.total,
-      byStatus: data.stats.byStatus.reduce(
-        (acc, item) => {
-          acc[item.status] = item.count;
-          return acc;
-        },
-        {} as Record<string, number>
-      ),
-      byPriority: data.stats.byPriority.reduce(
-        (acc, item) => {
-          // Handle the case where priority might be null
-          if (item.priority !== null && item.priority !== undefined) {
-            acc[item.priority.toString()] = item.count;
-          } else {
-            // You can either skip null priorities or store them with a special key
-            acc["unknown"] = (acc["unknown"] || 0) + item.count;
-          }
-          return acc;
-        },
-        {} as Record<string, number>
-      ),
-      byTimeframe: data.stats.byTimeframe.reduce(
-        (acc, item) => {
-          if (item.timeframe) {
-            acc[item.timeframe] = item.count;
-          }
-          return acc;
-        },
-        {} as Record<string, number>
-      ),
-    };
-  }, [data]);
-
-  return {
-    stats: processedStats,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  };
-
-   
-}
-  */
+// Additional hooks remain unchanged

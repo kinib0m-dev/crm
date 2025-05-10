@@ -12,32 +12,70 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Upload, File, Check, AlertCircle, Loader2 } from "lucide-react";
+import { Upload, File, Check, AlertCircle, Loader2, Info } from "lucide-react";
 import { useCreateLead } from "@/hooks/use-leads";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CreateLeadSchema } from "@/lib/validation/lead-schema";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 
-type CSVLeadData = {
-  name: string;
-  email?: string;
-  phone?: string;
-};
+type CSVLeadData = Record<string, string>;
 
 type ProcessingStatus = "idle" | "processing" | "success" | "error";
+
+// Define field types more strictly
+type FieldType = "string" | "number" | "date";
+
+// Valid lead field mappings - field name to expected data type
+const LEAD_FIELD_MAPPINGS: Record<string, FieldType> = {
+  name: "string",
+  email: "string",
+  phone: "string",
+  status: "string",
+  priority: "number",
+  qualificationScore: "number",
+  lastContactedAt: "date",
+  nextFollowUpDate: "date",
+  expectedPurchaseTimeframe: "string",
+  budget: "string",
+};
+
+// Valid lead status values (for validation)
+const VALID_LEAD_STATUSES = [
+  "new_lead",
+  "initial_contact",
+  "awaiting_response",
+  "engaged",
+  "information_gathering",
+  "high_interest",
+  "qualified",
+  "appointment_scheduled",
+  "proposal_sent",
+  "negotiation",
+  "converted",
+  "purchased_elsewhere",
+  "future_opportunity",
+  "periodic_nurture",
+  "reactivated",
+  "unsubscribed",
+  "invalid",
+];
+
+// Valid timeframe values (for validation)
+const VALID_TIMEFRAMES = ["immediate", "1-3 months", "3-6 months", "6+ months"];
 
 export function CSVLeadUpload() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [previewData, setPreviewData] = useState<CSVLeadData[]>([]);
+  const [fieldMappings, setFieldMappings] = useState<Record<string, string>>(
+    {}
+  );
   const [status, setStatus] = useState<ProcessingStatus>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [warnings, setWarnings] = useState<string[]>([]);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { createLead } = useCreateLead();
-
-  const user = useCurrentUser();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -50,13 +88,90 @@ export function CSVLeadUpload() {
       setError("Please upload a CSV file");
       setFile(null);
       setPreviewData([]);
+      setWarnings([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
     setFile(selectedFile);
     setError(null);
+    setWarnings([]);
     parseCSV(selectedFile);
+  };
+
+  // Function to convert CSV values to appropriate types based on field name
+  // Define a type for the possible field value types
+  type FieldValue = string | number | Date | undefined;
+
+  const convertValueToType = (value: string, fieldName: string): FieldValue => {
+    if (!value || value.trim() === "") return undefined;
+
+    const dataType = LEAD_FIELD_MAPPINGS[fieldName];
+    switch (dataType) {
+      case "number":
+        const num = parseFloat(value);
+        return isNaN(num) ? undefined : num;
+      case "date":
+        const date = new Date(value);
+        return isNaN(date.getTime()) ? undefined : date;
+      case "string":
+      default:
+        return value;
+    }
+  };
+
+  // Validate a single field value
+  const validateField = (fieldName: string, value: FieldValue): boolean => {
+    // Return true for undefined/empty values (handled in final validation)
+    if (value === undefined || value === null) return true;
+
+    switch (fieldName) {
+      case "status":
+        return typeof value === "string" && VALID_LEAD_STATUSES.includes(value);
+      case "priority":
+        return (
+          typeof value === "number" &&
+          Number.isInteger(value) &&
+          value >= 1 &&
+          value <= 5
+        );
+      case "expectedPurchaseTimeframe":
+        return typeof value === "string" && VALID_TIMEFRAMES.includes(value);
+      default:
+        return true;
+    }
+  };
+
+  // Function to normalize column names (handles whitespace, case, common aliases)
+  const normalizeColumnName = (header: string): string => {
+    const normalized = header.toLowerCase().trim().replace(/\s+/g, "");
+
+    // Common aliases/variations
+    const mappings: Record<string, string> = {
+      fullname: "name",
+      emailaddress: "email",
+      phonenumber: "phone",
+      phonenum: "phone",
+      cellphone: "phone",
+      mobile: "phone",
+      leadstatus: "status",
+      leadpriority: "priority",
+      prioritylevel: "priority",
+      score: "qualificationScore",
+      qualification: "qualificationScore",
+      lastcontact: "lastContactedAt",
+      lastcontacted: "lastContactedAt",
+      nextfollowup: "nextFollowUpDate",
+      followupdate: "nextFollowUpDate",
+      followup: "nextFollowUpDate",
+      purchasetimeframe: "expectedPurchaseTimeframe",
+      timeframe: "expectedPurchaseTimeframe",
+      purchasetiming: "expectedPurchaseTimeframe",
+      pricerange: "budget",
+      budgetrange: "budget",
+    };
+
+    return mappings[normalized] || normalized;
   };
 
   const parseCSV = (file: File) => {
@@ -64,8 +179,9 @@ export function CSVLeadUpload() {
     reader.onload = (e) => {
       try {
         const text = e.target?.result as string;
+        const newWarnings: string[] = [];
 
-        // Basic CSV parsing that handles quoted values
+        // Parse CSV line handling quoted values and commas
         const parseCsvLine = (line: string) => {
           const values: string[] = [];
           let inQuotes = false;
@@ -88,9 +204,8 @@ export function CSVLeadUpload() {
             currentValue += char;
           }
 
-          // Don't forget to add the last value
+          // Add the last value
           values.push(currentValue.trim());
-
           return values;
         };
 
@@ -102,50 +217,91 @@ export function CSVLeadUpload() {
           return;
         }
 
-        const headers = parseCsvLine(lines[0]).map((header) =>
-          header.trim().toLowerCase()
-        );
+        // Get raw headers and normalize them
+        const rawHeaders = parseCsvLine(lines[0]);
+        const normalizedHeaders = rawHeaders.map(normalizeColumnName);
 
-        const nameIndex = headers.findIndex((h) => h === "name");
-        const emailIndex = headers.findIndex((h) => h === "email");
-        const phoneIndex = headers.findIndex((h) => h === "phone");
+        // Create field mappings
+        const mappings: Record<string, string> = {};
+        const validFields = Object.keys(LEAD_FIELD_MAPPINGS);
 
-        if (nameIndex === -1) {
+        normalizedHeaders.forEach((header, index) => {
+          if (validFields.includes(header)) {
+            mappings[header] = rawHeaders[index];
+          }
+        });
+
+        setFieldMappings(mappings);
+
+        // Check if name column exists
+        if (!mappings.name) {
           setError("CSV must include a 'name' column");
           setPreviewData([]);
           return;
         }
 
-        const parsedData = lines
-          .slice(1)
-          .map((line) => {
-            // Skip empty lines
-            if (!line.trim()) return null;
+        // Process data with field mappings
+        const parsedData: CSVLeadData[] = [];
+        const headerIndexes: Record<string, number> = {};
 
-            const values = parseCsvLine(line);
+        // Map field names to column indexes
+        Object.keys(mappings).forEach((field) => {
+          const headerIndex = normalizedHeaders.indexOf(field);
+          if (headerIndex !== -1) {
+            headerIndexes[field] = headerIndex;
+          }
+        });
 
-            // Skip if no name value
-            if (!values[nameIndex] || !values[nameIndex].trim()) return null;
+        // Parse data rows
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
 
-            const data: CSVLeadData = {
-              name: values[nameIndex] || "",
-            };
+          const values = parseCsvLine(line);
 
-            if (emailIndex !== -1 && values[emailIndex])
-              data.email = values[emailIndex];
-            if (phoneIndex !== -1 && values[phoneIndex])
-              data.phone = values[phoneIndex];
+          // Skip if no name value
+          const nameIndex = headerIndexes.name;
+          if (
+            nameIndex === undefined ||
+            !values[nameIndex] ||
+            !values[nameIndex].trim()
+          ) {
+            continue;
+          }
 
-            return data;
-          })
-          .filter((lead): lead is CSVLeadData => lead !== null);
+          const leadData: CSVLeadData = {};
+
+          // Extract values using field mappings
+          Object.entries(headerIndexes).forEach(([field, index]) => {
+            if (index < values.length) {
+              leadData[field] = values[index];
+            }
+          });
+
+          if (Object.keys(leadData).length > 0) {
+            parsedData.push(leadData);
+          }
+        }
+
+        // Check for valid records
+        if (parsedData.length === 0) {
+          setError("No valid leads found in CSV");
+          setPreviewData([]);
+          return;
+        }
+
+        // Check for missing recommended fields
+        if (!mappings.email && !mappings.phone) {
+          newWarnings.push(
+            "Neither 'email' nor 'phone' columns found. Leads will be created with minimal contact info."
+          );
+        }
+
+        // Display warnings
+        setWarnings(newWarnings);
 
         // Preview first 5 records
         setPreviewData(parsedData.slice(0, 5));
-
-        if (parsedData.length === 0) {
-          setError("No valid leads found in CSV");
-        }
       } catch (err) {
         console.error("Error parsing CSV:", err);
         setError("Error parsing CSV file. Please check the format.");
@@ -172,7 +328,7 @@ export function CSVLeadUpload() {
       reader.onload = async (e) => {
         const text = e.target?.result as string;
 
-        // Use the same CSV parsing logic as in parseCSV
+        // Parse CSV line handling quoted values and commas
         const parseCsvLine = (line: string) => {
           const values: string[] = [];
           let inQuotes = false;
@@ -195,9 +351,8 @@ export function CSVLeadUpload() {
             currentValue += char;
           }
 
-          // Don't forget to add the last value
+          // Add the last value
           values.push(currentValue.trim());
-
           return values;
         };
 
@@ -207,50 +362,107 @@ export function CSVLeadUpload() {
           throw new Error("CSV file is empty");
         }
 
-        const headers = parseCsvLine(lines[0]).map((header) =>
-          header.trim().toLowerCase()
-        );
+        // Get raw headers and normalize them
+        const rawHeaders = parseCsvLine(lines[0]);
+        const normalizedHeaders = rawHeaders.map(normalizeColumnName);
 
-        const nameIndex = headers.findIndex((h) => h === "name");
-        const emailIndex = headers.findIndex((h) => h === "email");
-        const phoneIndex = headers.findIndex((h) => h === "phone");
+        // Create mapping of normalized field name to column index
+        const headerIndexes: Record<string, number> = {};
+        Object.keys(LEAD_FIELD_MAPPINGS).forEach((field) => {
+          const headerIndex = normalizedHeaders.indexOf(field);
+          if (headerIndex !== -1) {
+            headerIndexes[field] = headerIndex;
+          }
+        });
 
-        if (nameIndex === -1) {
+        // Check if name column exists
+        if (headerIndexes.name === undefined) {
           throw new Error("CSV must include a 'name' column");
         }
 
-        const leadsData = lines
-          .slice(1)
-          .map((line) => {
-            // Skip empty lines
-            if (!line.trim()) return null;
+        // Process the CSV data
+        const leadsData: CreateLeadSchema[] = [];
 
-            const values = parseCsvLine(line);
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
 
-            // Skip if no name value
-            if (!values[nameIndex] || !values[nameIndex].trim()) return null;
+          const values = parseCsvLine(line);
 
-            if (!user?.id) {
-              throw new Error("You must be logged in to upload leads.");
+          // Skip if no name value
+          const nameIndex = headerIndexes.name;
+          if (
+            nameIndex === undefined ||
+            !values[nameIndex] ||
+            !values[nameIndex].trim()
+          ) {
+            continue;
+          }
+
+          // Create lead data with default values
+          const leadData: CreateLeadSchema = {
+            name: values[nameIndex],
+            status: "new_lead", // Default status
+          };
+
+          // Add any additional fields
+          Object.entries(headerIndexes).forEach(([field, index]) => {
+            if (field === "name") return; // Skip name, already added
+
+            if (index < values.length) {
+              const value = convertValueToType(values[index], field);
+
+              if (value !== undefined && validateField(field, value)) {
+                // Use type-safe assignment for known fields
+                if (field === "email" && typeof value === "string") {
+                  leadData.email = value;
+                } else if (field === "phone" && typeof value === "string") {
+                  leadData.phone = value;
+                } else if (
+                  field === "status" &&
+                  typeof value === "string" &&
+                  VALID_LEAD_STATUSES.includes(value)
+                ) {
+                  leadData.status = value as LeadStatus; // Safe to cast here
+                } else if (field === "priority" && typeof value === "number") {
+                  leadData.priority = value;
+                } else if (
+                  field === "qualificationScore" &&
+                  typeof value === "number"
+                ) {
+                  leadData.qualificationScore = value;
+                } else if (
+                  field === "lastContactedAt" &&
+                  value instanceof Date
+                ) {
+                  leadData.lastContactedAt = value;
+                } else if (
+                  field === "nextFollowUpDate" &&
+                  value instanceof Date
+                ) {
+                  leadData.nextFollowUpDate = value;
+                } else if (
+                  field === "expectedPurchaseTimeframe" &&
+                  typeof value === "string" &&
+                  VALID_TIMEFRAMES.includes(value)
+                ) {
+                  leadData.expectedPurchaseTimeframe = value as
+                    | "immediate"
+                    | "1-3 months"
+                    | "3-6 months"
+                    | "6+ months";
+                } else if (field === "budget" && typeof value === "string") {
+                  leadData.budget = value;
+                }
+              }
             }
+          });
 
-            const leadData: CreateLeadSchema = {
-              name: values[nameIndex],
-              status: "new_lead",
-              priority: 3,
-            };
-
-            if (emailIndex !== -1 && values[emailIndex]) {
-              leadData.email = values[emailIndex];
-            }
-
-            if (phoneIndex !== -1 && values[phoneIndex]) {
-              leadData.phone = values[phoneIndex];
-            }
-
-            return leadData;
-          })
-          .filter((lead): lead is CreateLeadSchema => lead !== null);
+          // Validate the lead data has minimal required fields
+          if (leadData.name && leadData.name.trim() !== "") {
+            leadsData.push(leadData);
+          }
+        }
 
         setProgress({ current: 0, total: leadsData.length });
 
@@ -260,14 +472,6 @@ export function CSVLeadUpload() {
         // Process leads sequentially to avoid overwhelming the server
         for (let i = 0; i < leadsData.length; i++) {
           try {
-            // Check if lead has all required fields before creating
-            if (!leadsData[i].name || leadsData[i].name.trim() === "") {
-              console.warn(`Skipping lead at index ${i}: Missing name`);
-              failCount++;
-              continue;
-            }
-
-            // Attempt to create the lead - no individual toast here
             await createLead(leadsData[i]);
             successCount++;
           } catch (error) {
@@ -286,7 +490,7 @@ export function CSVLeadUpload() {
 
         setStatus("success");
 
-        // Single summary toast at the end
+        // Summary toast at the end
         toast.success(`Successfully created ${successCount} leads`);
 
         if (failCount > 0) {
@@ -318,7 +522,9 @@ export function CSVLeadUpload() {
     setPreviewData([]);
     setStatus("idle");
     setError(null);
+    setWarnings([]);
     setProgress({ current: 0, total: 0 });
+    setFieldMappings({});
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -327,9 +533,9 @@ export function CSVLeadUpload() {
       <CardHeader>
         <CardTitle>Upload CSV File</CardTitle>
         <CardDescription>
-          Upload a CSV file with lead information. The file must have a column
-          named &quot;name&quot;. Optional columns: &quot;email&quot;,
-          &quot;phone&quot;.
+          Upload a CSV file with lead information. The file must include a
+          column named &quot;name&quot;. The system will auto-detect and map
+          other lead fields like email, phone, status, priority, etc.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -354,6 +560,23 @@ export function CSVLeadUpload() {
             )}
           </div>
 
+          {/* Warnings */}
+          {warnings.length > 0 && (
+            <div className="rounded-md border border-yellow-200 bg-yellow-50 p-4">
+              <div className="flex items-start gap-2">
+                <Info className="size-5 text-yellow-600" />
+                <div className="text-sm text-yellow-800">
+                  <p className="font-medium">Warnings:</p>
+                  <ul className="ml-5 list-disc">
+                    {warnings.map((warning, index) => (
+                      <li key={index}>{warning}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* File Info */}
           {file && (
             <div className="rounded-md border p-4">
@@ -367,27 +590,47 @@ export function CSVLeadUpload() {
             </div>
           )}
 
+          {/* Detected Fields */}
+          {Object.keys(fieldMappings).length > 0 && (
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium">Detected Fields:</h4>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(fieldMappings).map(
+                  ([field, originalHeader]) => (
+                    <Badge key={field} variant="secondary">
+                      {originalHeader} → {field}
+                    </Badge>
+                  )
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Preview */}
           {previewData.length > 0 && (
             <div className="space-y-3">
               <h4 className="text-sm font-medium">
                 Preview (first 5 records):
               </h4>
-              <div className="rounded-md border">
+              <div className="rounded-md border overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b bg-muted/50">
-                      <th className="p-2 text-left font-medium">Name</th>
-                      <th className="p-2 text-left font-medium">Email</th>
-                      <th className="p-2 text-left font-medium">Phone</th>
+                      {Object.keys(fieldMappings).map((field) => (
+                        <th key={field} className="p-2 text-left font-medium">
+                          {field}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
                     {previewData.map((lead, index) => (
                       <tr key={index} className="border-b last:border-0">
-                        <td className="p-2">{lead.name}</td>
-                        <td className="p-2">{lead.email || "-"}</td>
-                        <td className="p-2">{lead.phone || "-"}</td>
+                        {Object.keys(fieldMappings).map((field) => (
+                          <td key={field} className="p-2">
+                            {lead[field] || "-"}
+                          </td>
+                        ))}
                       </tr>
                     ))}
                   </tbody>
