@@ -51,6 +51,9 @@ import {
 import { NotesPreview } from "../notes/NotesPreview";
 import { TasksPreview } from "../tasks/TaskPreview";
 import { LeadSendEmail } from "../email/LeadsSendEmail";
+import { LeadTagsManagement } from "../tags/LeadTagsManagement";
+import { LeadTagsDisplay } from "../tags/LeadTagsDisplay";
+import { LeadTagQuickAdd } from "../tags/LeadTagsQuickAdd";
 
 interface LeadsDetailViewProps {
   lead: LeadWithTags;
@@ -361,30 +364,12 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
                 <div className="flex items-start gap-3">
                   <Tag className="h-4 w-4 text-muted-foreground mt-0.5" />
                   <div className="w-full">
-                    <div className="text-sm text-muted-foreground">Tags</div>
-                    <div className="font-medium">
-                      {lead.tags && lead.tags.length > 0 ? (
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {lead.tags.map((tag) => (
-                            <div
-                              key={tag.id}
-                              className="flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs"
-                              style={{
-                                backgroundColor: tag.color
-                                  ? `${tag.color}20`
-                                  : "#e5e7eb",
-                                borderColor: tag.color ? tag.color : "#d1d5db",
-                              }}
-                            >
-                              <span>{tag.name}</span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground italic">
-                          No tags
-                        </span>
-                      )}
+                    <div className="flex justify-between items-center">
+                      <div className="text-sm text-muted-foreground">Tags</div>
+                      <LeadTagQuickAdd leadId={lead.id} />
+                    </div>
+                    <div className="font-medium mt-1">
+                      <LeadTagsDisplay leadId={lead.id} displayType="inline" />
                     </div>
                   </div>
                 </div>
@@ -514,9 +499,7 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
             <h3 className="text-xl font-semibold">Tags</h3>
           </div>
 
-          <Card>
-            <CardContent className="p-6"></CardContent>
-          </Card>
+          <LeadTagsManagement leadId={lead.id} />
         </TabsContent>
       </Tabs>
     </div>
