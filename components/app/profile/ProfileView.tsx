@@ -183,7 +183,7 @@ export function ProfileView() {
                         {loginActivities.map((activity) => (
                           <div
                             key={activity.id}
-                            className="flex items-start gap-4"
+                            className="flex items-center gap-4"
                           >
                             <div
                               className={`p-2 rounded-full ${activity.success ? "bg-green-100" : "bg-red-100"}`}
@@ -206,12 +206,6 @@ export function ProfileView() {
                                   )}
                                 </span>
                               </div>
-                              <p className="text-sm text-muted-foreground">
-                                IP: {activity.ipAddress}
-                              </p>
-                              <p className="text-xs text-muted-foreground truncate">
-                                {activity.userAgent}
-                              </p>
                             </div>
                           </div>
                         ))}
