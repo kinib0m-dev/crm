@@ -8,12 +8,14 @@ import { leadNoteRouter } from "@/lib/leads/server/notes-procedures";
 import { leadTaskRouter } from "@/lib/leads/server/task-procedures";
 import { emailTemplateRouter } from "@/lib/emails/server/procedures";
 import { dashboardRouter } from "@/lib/dashboard/server/procedures";
+import { leadTagsRouter } from "@/lib/leads/server/tags-procedures";
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,
   lead: leadRouter,
   leadNote: leadNoteRouter,
   leadTask: leadTaskRouter,
+  leadTags: leadTagsRouter,
   botDocument: botDocumentRouter,
   carStock: carStockRouter,
   botChat: botChatRouter,

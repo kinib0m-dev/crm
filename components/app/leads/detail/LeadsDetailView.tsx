@@ -360,7 +360,7 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
 
                 <div className="flex items-start gap-3">
                   <Tag className="h-4 w-4 text-muted-foreground mt-0.5" />
-                  <div>
+                  <div className="w-full">
                     <div className="text-sm text-muted-foreground">Tags</div>
                     <div className="font-medium">
                       {lead.tags && lead.tags.length > 0 ? (
@@ -396,7 +396,7 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
 
       {/* Tabs for detailed information */}
       <Tabs defaultValue="interactions" className="w-full">
-        <TabsList className="w-full grid grid-cols-4 mb-8">
+        <TabsList className="w-full grid grid-cols-5 mb-8">
           <TabsTrigger value="interactions">
             <MessageSquare className="h-4 w-4 mr-2" />
             Interactions
@@ -412,6 +412,10 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
           <TabsTrigger value="emails">
             <Mail className="h-4 w-4 mr-2" />
             Emails
+          </TabsTrigger>
+          <TabsTrigger value="tags">
+            <Tag className="h-4 w-4 mr-2" />
+            Tags
           </TabsTrigger>
         </TabsList>
 
@@ -502,6 +506,17 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
             leadName={lead.name}
             leadEmail={lead.email}
           />
+        </TabsContent>
+
+        {/* Tags Tab */}
+        <TabsContent value="tags">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold">Tags</h3>
+          </div>
+
+          <Card>
+            <CardContent className="p-6"></CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
