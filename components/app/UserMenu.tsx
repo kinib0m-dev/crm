@@ -14,6 +14,7 @@ import { User, Settings, LogOut, ChevronRight } from "lucide-react";
 import { logOut } from "@/lib/auth/auth.actions";
 import Link from "next/link";
 import { useSidebar } from "../ui/sidebar";
+import { cn } from "@/lib/utils";
 
 type UserMenuProps = {
   name?: string | null;
@@ -26,7 +27,12 @@ export function UserMenu({ name, email, image }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="w-full text-left flex items-center gap-2 p-2 rounded-md hover:bg-sidebar-accent">
+        <button
+          className={cn(
+            "w-full text-left flex items-center gap-2 p-2 rounded-md hover:bg-sidebar-accent",
+            !open && "justify-center"
+          )}
+        >
           <Avatar className="h-8 w-8">
             {image ? (
               <AvatarImage src={image} alt={name || ""} />

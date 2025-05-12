@@ -236,12 +236,17 @@ export function AppSidebar({ name, email, image }: UserMenuProps) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
       <SidebarFooter>
         <SidebarGroup>
-          <SidebarGroupLabel className="px-2">Account</SidebarGroupLabel>
-          <div className="flex items-center">
-            <UserMenu name={name} email={email} image={image} />
-          </div>
+          {open && (
+            <SidebarGroupLabel className="px-2">Account</SidebarGroupLabel>
+          )}
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <UserMenu name={name} email={email} image={image} />
+            </SidebarMenuItem>
+          </SidebarMenu>
         </SidebarGroup>
       </SidebarFooter>
     </Sidebar>
