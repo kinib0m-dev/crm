@@ -691,4 +691,57 @@ export const emailTemplateRouter = createTRPCRouter({
         });
       }
     }),
+  // Get email history for a specific lead
+  getEmailHistoryByLeadId: protectedProcedure
+    .input(
+      z.object({
+        leadId: z.string().uuid(),
+        limit: z.number().int().min(1).max(20).default(5),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      try {
+        const userId = ctx.userId as string;
+        const { leadId, limit } = input;
+
+        // Find email history entries that include this lead
+        const historyResults = await db
+          .select({
+            id: emailHistory.id,
+            templateId: emailHistory.templateId,
+            subject: emailHistory.subject,
+            sentAt: emailHistory.sentAt,
+            sentCount: emailHistory.sentCount,
+            templateName: emailTemplates.name,
+          })
+          .from(emailHistoryLeads)
+          .innerJoin(
+            emailHistory,
+            eq(emailHistoryLeads.historyId, emailHistory.id)
+          )
+          .leftJoin(
+            emailTemplates,
+            eq(emailHistory.templateId, emailTemplates.id)
+          )
+          .where(
+            and(
+              eq(emailHistoryLeads.leadId, leadId),
+              eq(emailHistory.userId, userId)
+            )
+          )
+          .orderBy(desc(emailHistory.sentAt))
+          .limit(limit);
+
+        return {
+          success: true,
+          history: historyResults,
+        };
+      } catch (error) {
+        console.error("Error fetching lead email history:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch lead email history",
+        });
+      }
+    }),
 });

@@ -321,3 +321,27 @@ export function useEmailHistoryDetails(id: string) {
     refetch,
   };
 }
+
+/**
+ * Hook for fetching email history for a specific lead
+ */
+export function useLeadEmailHistory(leadId: string, limit = 5) {
+  const enabled = !!leadId;
+
+  const { data, isLoading, isError, error, refetch } =
+    trpc.emailTemplate.getEmailHistoryByLeadId.useQuery(
+      { leadId, limit },
+      {
+        enabled,
+        staleTime: 30 * 1000, // 30 seconds
+      }
+    );
+
+  return {
+    history: data?.history || [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  };
+}
