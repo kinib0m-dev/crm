@@ -46,6 +46,58 @@ function replaceVariables(text: string, lead: LeadData): string {
 }
 
 /**
+ * Checks if HTML content already has a complete structure
+ * with html, body tags, or if it's just a fragment
+ */
+function isCompleteHtmlDocument(content: string): boolean {
+  return (
+    /<html[^>]*>/.test(content.toLowerCase()) &&
+    /<body[^>]*>/.test(content.toLowerCase())
+  );
+}
+
+/**
+ * Prepares email content for sending - either using it as-is
+ * if it's complete HTML, or wrapping it in a basic structure
+ * if it's just a fragment
+ */
+function prepareEmailContent(content: string): string {
+  // If it's already a complete HTML document, use it as is
+  if (isCompleteHtmlDocument(content)) {
+    return content;
+  }
+
+  // If content doesn't have a wrapping div, add minimum formatting
+  if (!content.trim().startsWith("<div")) {
+    content = `<div>${content}</div>`;
+  }
+
+  // Only add basic email wrapper with minimal styling
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <title>Email</title>
+      <style>
+        body, html {
+          margin: 0;
+          padding: 0;
+          font-family: Arial, sans-serif;
+          line-height: 1.5;
+        }
+      </style>
+    </head>
+    <body>
+      ${content}
+    </body>
+    </html>
+  `;
+}
+
+/**
  * Main function to send emails to leads with proper variable replacement
  */
 export async function sendEmailToLeads({
@@ -73,12 +125,12 @@ export async function sendEmailToLeads({
       const personalizedSubject = replaceVariables(template.subject, lead);
       const personalizedContent = replaceVariables(template.content, lead);
 
-      // Format the email using HTML template
-      const htmlContent = formatEmailContent(personalizedContent);
+      // Prepare the email content, respecting existing HTML structure
+      const htmlContent = prepareEmailContent(personalizedContent);
 
       // Send the email
       const result = await resend.emails.send({
-        from: "onboarding@resend.dev",
+        from: process.env.EMAIL_FROM || "onboarding@resend.dev",
         to: lead.email,
         subject: personalizedSubject,
         html: htmlContent,
@@ -92,18 +144,4 @@ export async function sendEmailToLeads({
     }
   }
   return successCount;
-}
-
-/**
- * Formats the email content with HTML
- */
-function formatEmailContent(content: string): string {
-  return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
-      ${content}
-      <p style="font-size: 12px; color: #888; text-align: center; margin-top: 30px; border-top: 1px solid #e0e0e0; padding-top: 15px;">
-        If you wish to unsubscribe, please contact us directly.
-      </p>
-    </div>
-  `;
 }

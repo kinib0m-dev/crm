@@ -8,7 +8,7 @@ import { EmailTemplateForm } from "./EmailTemplateForm";
 export function NewEmailTemplateView() {
   return (
     <div className="container py-6">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-5xl">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="outline" size="icon" asChild>
