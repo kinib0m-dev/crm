@@ -4,7 +4,7 @@ import { trpc } from "@/trpc/server";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Bot Playground | CRM",
+  title: "Bot Playground",
   description: "Test your bot and simulate customer interactions",
 };
 

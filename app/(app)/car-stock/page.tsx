@@ -4,7 +4,7 @@ import { trpc } from "@/trpc/server";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Car Stock Management | CRM",
+  title: "Car Stock Management",
   description: "Manage your car stock and inventory",
 };
 

@@ -4,7 +4,7 @@ import { trpc } from "@/trpc/server";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Leads Management | CRM",
+  title: "Leads Management",
   description: "Manage your leads and track sales opportunities",
 };
 
