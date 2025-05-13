@@ -10,12 +10,6 @@ export async function GET(request: Request) {
   const token = url.searchParams.get("hub.verify_token");
   const challenge = url.searchParams.get("hub.challenge");
 
-  // Log for debugging
-  console.log("Mode:", mode);
-  console.log("Token:", token);
-  console.log("Challenge:", challenge);
-  console.log("Expected token:", process.env.FACEBOOK_WEBHOOK_VERIFY_TOKEN);
-
   // Facebook webhook verification
   const verifyToken = process.env.FACEBOOK_WEBHOOK_VERIFY_TOKEN;
 
