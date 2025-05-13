@@ -28,16 +28,11 @@ export function StatsCards({
 
   // Calculate leads in active funnel stages
   const activeLeadStages = [
-    "new_lead",
-    "initial_contact",
-    "awaiting_response",
-    "engaged",
-    "information_gathering",
-    "high_interest",
-    "qualified",
-    "appointment_scheduled",
-    "proposal_sent",
-    "negotiation",
+    "lead_entrante",
+    "en_conversacion",
+    "opciones_enviadas",
+    "vehiculo_elegido",
+    "asesor",
   ];
 
   const activeLeads = leadCounts
@@ -45,13 +40,8 @@ export function StatsCards({
     .reduce((sum, item) => sum + Number(item.count), 0);
 
   // Calculate qualified leads
-  const qualifiedStages = [
-    "high_interest",
-    "qualified",
-    "appointment_scheduled",
-    "proposal_sent",
-    "negotiation",
-  ];
+
+  const qualifiedStages = ["vehiculo_elegido", "asesor"];
 
   const qualifiedLeads = leadCounts
     .filter((item) => qualifiedStages.includes(item.status))
@@ -59,7 +49,7 @@ export function StatsCards({
 
   // Calculate conversion rate
   const convertedLeads = leadCounts
-    .filter((item) => item.status === "converted")
+    .filter((item) => item.status === "venta_realizada")
     .reduce((sum, item) => sum + Number(item.count), 0);
 
   const conversionRate =

@@ -37,19 +37,21 @@ export function LeadTable({
 }: LeadTableProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "new_lead":
+      case "lead_entrante":
         return "bg-blue-100 text-blue-800";
-      case "initial_contact":
+      case "en_conversacion":
         return "bg-indigo-100 text-indigo-800";
-      case "qualified":
+      case "opciones_enviadas":
+        return "bg-indigo-100 text-indigo-800";
+      case "vehiculo_elegido":
         return "bg-purple-100 text-purple-800";
-      case "high_interest":
+      case "asesor":
         return "bg-violet-100 text-violet-800";
-      case "converted":
+      case "venta_realizada":
         return "bg-green-100 text-green-800";
-      case "proposal_sent":
+      case "sin_opcion":
         return "bg-amber-100 text-amber-800";
-      case "periodic_nurture":
+      case "no_cualificado":
       default:
         return "bg-gray-100 text-gray-800";
     }

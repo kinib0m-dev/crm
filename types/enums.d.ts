@@ -1,21 +1,12 @@
 type LeadStatus =
-  | "new_lead"
-  | "initial_contact"
-  | "awaiting_response"
-  | "engaged"
-  | "information_gathering"
-  | "high_interest"
-  | "qualified"
-  | "appointment_scheduled"
-  | "proposal_sent"
-  | "negotiation"
-  | "converted"
-  | "purchased_elsewhere"
-  | "future_opportunity"
-  | "periodic_nurture"
-  | "reactivated"
-  | "unsubscribed"
-  | "invalid";
+  | "lead_entrante"
+  | "en_conversacion"
+  | "opciones_enviadas"
+  | "vehiculo_elegido"
+  | "sin_opcion"
+  | "asesor"
+  | "venta_realizada"
+  | "no_cualificado";
 
 type InteractionType =
   | "email"

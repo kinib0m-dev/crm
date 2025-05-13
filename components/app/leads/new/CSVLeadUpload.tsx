@@ -402,7 +402,7 @@ export function CSVLeadUpload() {
           // Create lead data with default values
           const leadData: CreateLeadSchema = {
             name: values[nameIndex],
-            status: "new_lead", // Default status
+            status: "lead_entrante", // Default status
           };
 
           // Add any additional fields

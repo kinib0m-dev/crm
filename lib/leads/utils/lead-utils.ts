@@ -47,14 +47,13 @@ export function daysUntilNextFollowUp(lead: LeadWithTags): number | null {
 export function getLeadStatusIndicator(lead: LeadWithTags) {
   // Define status categories and their corresponding colors
   const statusColors = {
-    new: ["new_lead", "initial_contact"],
-    active: ["awaiting_response", "engaged", "information_gathering"],
-    qualified: ["high_interest", "qualified", "appointment_scheduled"],
-    converting: ["proposal_sent", "negotiation"],
-    converted: ["converted"],
-    dormant: ["purchased_elsewhere", "future_opportunity", "periodic_nurture"],
-    reactivated: ["reactivated"],
-    closed: ["unsubscribed", "invalid"],
+    nuevo: ["lead_entrante"],
+    activo: ["en_conversacion", "opciones_enviadas"],
+    cualificado: ["vehiculo_elegido"],
+    asesor: ["asesor"],
+    inactivo: ["sin_opcion"],
+    no_cualificado: ["no_cualificado"],
+    cerrado: ["venta_realizada"],
   };
 
   // Find which category the lead's status belongs to
@@ -69,22 +68,20 @@ export function getLeadStatusIndicator(lead: LeadWithTags) {
 
 function getCategoryColor(category: string): string {
   switch (category) {
-    case "new":
+    case "nuevo":
       return "blue";
-    case "active":
-      return "emerald";
-    case "qualified":
-      return "purple";
-    case "converting":
-      return "amber";
-    case "converted":
-      return "green";
-    case "dormant":
-      return "gray";
-    case "reactivated":
+    case "activo":
       return "indigo";
-    case "closed":
-      return "red";
+    case "cualificado":
+      return "purple";
+    case "asesor":
+      return "violet";
+    case "inactivo":
+      return "amber";
+    case "no_cualificado":
+      return "gray";
+    case "cerrado":
+      return "green";
     default:
       return "gray";
   }

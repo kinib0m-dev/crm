@@ -102,24 +102,23 @@ export function LeadsDetailView({ lead }: LeadsDetailViewProps) {
   };
 
   // Get status badge color
-  const getStatusColor = (category: string) => {
-    switch (category) {
-      case "new":
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "lead_entrante":
         return "bg-blue-100 text-blue-800";
-      case "active":
-        return "bg-emerald-100 text-emerald-800";
-      case "qualified":
-        return "bg-purple-100 text-purple-800";
-      case "converting":
-        return "bg-amber-100 text-amber-800";
-      case "converted":
-        return "bg-green-100 text-green-800";
-      case "dormant":
-        return "bg-gray-100 text-gray-800";
-      case "reactivated":
+      case "en_conversacion":
         return "bg-indigo-100 text-indigo-800";
-      case "closed":
-        return "bg-red-100 text-red-800";
+      case "opciones_enviadas":
+        return "bg-indigo-100 text-indigo-800";
+      case "vehiculo_elegido":
+        return "bg-purple-100 text-purple-800";
+      case "asesor":
+        return "bg-violet-100 text-violet-800";
+      case "venta_realizada":
+        return "bg-green-100 text-green-800";
+      case "sin_opcion":
+        return "bg-amber-100 text-amber-800";
+      case "no_cualificado":
       default:
         return "bg-gray-100 text-gray-800";
     }

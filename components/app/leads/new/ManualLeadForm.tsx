@@ -53,7 +53,7 @@ export function ManualLeadForm() {
       name: "",
       email: "",
       phone: "",
-      status: "new_lead",
+      status: "lead_entrante",
       sourceId: undefined,
       priority: 3,
       qualificationScore: 0,

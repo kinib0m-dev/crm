@@ -147,30 +147,14 @@ export const loginActivities = pgTable("login_activities", {
 
 // ------------------------------------ LEADS ------------------------------------
 export const leadStatusEnum = pgEnum("lead_status", [
-  // Initial Engagement Phase
-  "new_lead",
-  "initial_contact",
-  "awaiting_response",
-  // Qualification Phase
-  "engaged",
-  "information_gathering",
-  "high_interest",
-  "qualified",
-  // Conversion Phase
-  "appointment_scheduled",
-  "proposal_sent",
-  "negotiation",
-  // Outcome Phase
-  "converted",
-  "purchased_elsewhere",
-  // Nurture Phase
-  "future_opportunity",
-  "periodic_nurture",
-  // Re-engagement Phase
-  "reactivated",
-  // Administrative Statuses
-  "unsubscribed",
-  "invalid",
+  "lead_entrante",
+  "en_conversacion",
+  "opciones_enviadas",
+  "vehiculo_elegido",
+  "sin_opcion",
+  "asesor",
+  "venta_realizada",
+  "no_cualificado",
 ]);
 
 export const timeframeEnum = pgEnum("timeframe_enum", [
@@ -195,7 +179,7 @@ export const leads = pgTable("leads", {
   name: text("name").notNull(),
   email: text("email").unique(),
   phone: text("phone").unique(),
-  status: leadStatusEnum("status").default("new_lead").notNull(),
+  status: leadStatusEnum("status").default("lead_entrante").notNull(),
   sourceId: uuid("source_id").references(() => leadSources.id),
   priority: integer("priority").default(3),
   qualificationScore: integer("qualification_score").default(0),

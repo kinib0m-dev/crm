@@ -13,17 +13,14 @@ import {
 
 // Define the lead funnel stages with appropriate display names
 const FUNNEL_STAGES = [
-  { id: "new_lead", name: "New Leads", color: "#4F46E5" },
-  { id: "initial_contact", name: "Initial Contact", color: "#6366F1" },
-  { id: "awaiting_response", name: "Awaiting Response", color: "#8B5CF6" },
-  { id: "engaged", name: "Engaged", color: "#A855F7" },
-  { id: "information_gathering", name: "Info Gathering", color: "#D946EF" },
-  { id: "high_interest", name: "High Interest", color: "#EC4899" },
-  { id: "qualified", name: "Qualified", color: "#F43F5E" },
-  { id: "appointment_scheduled", name: "Appointment Set", color: "#EF4444" },
-  { id: "proposal_sent", name: "Proposal Sent", color: "#F97316" },
-  { id: "negotiation", name: "Negotiation", color: "#FBBF24" },
-  { id: "converted", name: "Converted", color: "#22C55E" },
+  { id: "lead_entrante", name: "Lead Entrante", color: "#4F46E5" },
+  { id: "en_conversacion", name: "En Conversación", color: "#6366F1" },
+  { id: "opciones_enviadas", name: "Opciones Enviadas", color: "#8B5CF6" },
+  { id: "vehiculo_elegido", name: "Vehículo Elegido", color: "#FBBF24" },
+  { id: "asesor", name: "Paso a Asesor", color: "#F97316" },
+  { id: "venta_realizada", name: "Venta Realizada", color: "#22C55E" },
+  { id: "sin_opcion", name: "Sin Opción", color: "#A1A1AA" },
+  { id: "no_cualificado", name: "No Cualificado", color: "#EF4444" },
 ];
 
 type LeadCount = {
