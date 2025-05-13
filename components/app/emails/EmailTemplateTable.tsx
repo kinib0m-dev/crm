@@ -357,9 +357,6 @@ function TemplateRow({
             <DropdownMenuItem asChild>
               <Link href={`/emails/${template.id}/edit`}>Edit Template</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href={`/emails/${template.id}/duplicate`}>Duplicate</Link>
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => onSendClick(template)}>
               <Send className="h-4 w-4 mr-2" />
