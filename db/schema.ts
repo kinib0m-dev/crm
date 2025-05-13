@@ -164,6 +164,14 @@ export const timeframeEnum = pgEnum("timeframe_enum", [
   "6+ months",
 ]);
 
+export const leadSourceTypeEnum = pgEnum("lead_source_type", [
+  "facebook",
+  "manual",
+  "website",
+  "referral",
+  "other",
+]);
+
 export const leads = pgTable("leads", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: text("user_id")
@@ -173,8 +181,10 @@ export const leads = pgTable("leads", {
   email: text("email").unique(),
   phone: text("phone").unique(),
   status: leadStatusEnum("status").default("lead_entrante").notNull(),
+  campaignId: uuid("campaign_id").references(() => campaigns.id, {
+    onDelete: "set null",
+  }),
   priority: integer("priority").default(3),
-  qualificationScore: integer("qualification_score").default(0),
   lastContactedAt: timestamp("last_contacted_at", { mode: "date" }),
   nextFollowUpDate: timestamp("next_follow_up_date", { mode: "date" }),
   expectedPurchaseTimeframe: timeframeEnum("expected_purchase_timeframe"),
@@ -428,3 +438,29 @@ export const emailHistoryLeads = pgTable(
 );
 
 // -------------------------------------- FACEBOOK --------------------------------------
+// Facebook campaign table
+export const campaigns = pgTable("campaigns", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  externalId: text("external_id"), // Facebook campaign ID
+  name: text("name").notNull(),
+  type: text("type").default("facebook").notNull(),
+  formId: text("form_id"), // Facebook form ID
+  adId: text("ad_id"), // Facebook ad ID
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// For tracking and debugging webhook events
+export const webhookLogs = pgTable("webhook_logs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  eventType: text("event_type").notNull(),
+  payload: text("payload").notNull(),
+  status: text("status").default("received").notNull(),
+  error: text("error"),
+  processedAt: timestamp("processed_at", { mode: "date" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

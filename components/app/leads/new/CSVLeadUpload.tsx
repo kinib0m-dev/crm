@@ -32,7 +32,6 @@ const LEAD_FIELD_MAPPINGS: Record<string, FieldType> = {
   phone: "string",
   status: "string",
   priority: "number",
-  qualificationScore: "number",
   lastContactedAt: "date",
   nextFollowUpDate: "date",
   expectedPurchaseTimeframe: "string",
@@ -41,23 +40,14 @@ const LEAD_FIELD_MAPPINGS: Record<string, FieldType> = {
 
 // Valid lead status values (for validation)
 const VALID_LEAD_STATUSES = [
-  "new_lead",
-  "initial_contact",
-  "awaiting_response",
-  "engaged",
-  "information_gathering",
-  "high_interest",
-  "qualified",
-  "appointment_scheduled",
-  "proposal_sent",
-  "negotiation",
-  "converted",
-  "purchased_elsewhere",
-  "future_opportunity",
-  "periodic_nurture",
-  "reactivated",
-  "unsubscribed",
-  "invalid",
+  "lead_entrante",
+  "en_conversacion",
+  "opciones_enviadas",
+  "vehiculo_elegido",
+  "sin_opcion",
+  "asesor",
+  "venta_realizada",
+  "no_cualificado",
 ];
 
 // Valid timeframe values (for validation)
@@ -158,7 +148,6 @@ export function CSVLeadUpload() {
       leadpriority: "priority",
       prioritylevel: "priority",
       score: "qualificationScore",
-      qualification: "qualificationScore",
       lastcontact: "lastContactedAt",
       lastcontacted: "lastContactedAt",
       nextfollowup: "nextFollowUpDate",
@@ -426,11 +415,6 @@ export function CSVLeadUpload() {
                   leadData.status = value as LeadStatus; // Safe to cast here
                 } else if (field === "priority" && typeof value === "number") {
                   leadData.priority = value;
-                } else if (
-                  field === "qualificationScore" &&
-                  typeof value === "number"
-                ) {
-                  leadData.qualificationScore = value;
                 } else if (
                   field === "lastContactedAt" &&
                   value instanceof Date
