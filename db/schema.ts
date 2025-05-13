@@ -164,13 +164,6 @@ export const timeframeEnum = pgEnum("timeframe_enum", [
   "6+ months",
 ]);
 
-export const leadSourceTypeEnum = pgEnum("lead_source_type", [
-  "online",
-  "offline",
-  "referral",
-  "other",
-]);
-
 export const leads = pgTable("leads", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: text("user_id")
@@ -180,7 +173,6 @@ export const leads = pgTable("leads", {
   email: text("email").unique(),
   phone: text("phone").unique(),
   status: leadStatusEnum("status").default("lead_entrante").notNull(),
-  sourceId: uuid("source_id").references(() => leadSources.id),
   priority: integer("priority").default(3),
   qualificationScore: integer("qualification_score").default(0),
   lastContactedAt: timestamp("last_contacted_at", { mode: "date" }),
@@ -190,15 +182,6 @@ export const leads = pgTable("leads", {
   isDeleted: boolean("is_deleted").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-export const leadSources = pgTable("lead_sources", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-  type: leadSourceTypeEnum("type").default("online").notNull(),
-  isActive: boolean("is_active").default(true),
-  description: text("description"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const tags = pgTable("tags", {
@@ -445,50 +428,3 @@ export const emailHistoryLeads = pgTable(
 );
 
 // -------------------------------------- FACEBOOK --------------------------------------
-/*
-// Facebook Integration
-export const facebookSettings = pgTable("facebook_settings", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  accessToken: text("access_token").notNull(),
-  appSecret: text("app_secret").notNull(),
-  webhookToken: text("webhook_token").notNull(),
-  formIds: text("form_ids").array(),
-  isActive: boolean("is_active").default(true),
-  lastSyncedAt: timestamp("last_synced_at", { mode: "date" }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-// Facebook Lead tracking
-export const facebookLeads = pgTable("facebook_leads", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  leadId: text("lead_id").notNull(),
-  formId: text("form_id").notNull(),
-  crmLeadId: uuid("crm_lead_id").references(() => leads.id),
-  rawData: text("raw_data"), // JSON data of the lead
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  processedAt: timestamp("processed_at", { mode: "date" }),
-});
-
-// Facebook Form tracking
-export const facebookForms = pgTable("facebook_forms", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  formId: text("form_id").notNull(),
-  formName: text("form_name"),
-  pageId: text("page_id"),
-  pageName: text("page_name"),
-  assignToStatus: text("assign_to_status").default("new_lead"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-*/

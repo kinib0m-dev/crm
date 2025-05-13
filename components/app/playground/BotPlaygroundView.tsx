@@ -47,7 +47,6 @@ export function BotPlaygroundView({ conversations }: BotPlaygroundViewProps) {
     null
   );
   const [isTyping, setIsTyping] = useState(false);
-  const [customerType, setCustomerType] = useState("default");
 
   // Ref for messages scroll area
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -106,16 +105,7 @@ export function BotPlaygroundView({ conversations }: BotPlaygroundViewProps) {
       setIsTyping(true);
       setNewMessage(""); // Clear input right away
 
-      // Send message with customer type context
-      let messageToSend = newMessage;
-      if (customerType !== "default") {
-        // We'll silently add context for the bot in the first message only
-        if (messages.filter((m) => m.role === "user").length === 0) {
-          messageToSend = `[Context: I'm a ${customerType} customer, but respond normally as if you don't know this] ${messageToSend}`;
-        }
-      }
-
-      await sendMessage(selectedConversationId, messageToSend);
+      await sendMessage(selectedConversationId, newMessage);
 
       // Wait a bit before refreshing to allow the "typing" indicator to show
       setTimeout(() => {
@@ -283,22 +273,12 @@ export function BotPlaygroundView({ conversations }: BotPlaygroundViewProps) {
           <Card className="flex flex-col h-[calc(100vh-200px)] overflow-hidden">
             {/* Fixed header */}
             <div className="border-b p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-lg font-medium">
-                    {conversation?.name || "Loading..."}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Testing with Pedro (Sales Rep)
-                  </div>
+              <div className="flex items-center justify-center">
+                <div className="text-lg font-medium">
+                  {conversation?.name || "Loading..."}
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    Flag for Follow-up
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    Escalate to Manager
-                  </Button>
+                <div className="text-sm text-muted-foreground">
+                  Testing with Pedro (Sales Rep)
                 </div>
               </div>
             </div>
@@ -355,25 +335,6 @@ export function BotPlaygroundView({ conversations }: BotPlaygroundViewProps) {
             {/* Fixed input area */}
             <div className="border-t p-4">
               <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">
-                      Simulate customer type:
-                    </span>
-                    <select
-                      className="text-xs bg-muted p-1 rounded border"
-                      value={customerType}
-                      onChange={(e) => setCustomerType(e.target.value)}
-                    >
-                      <option value="default">Default</option>
-                      <option value="interested">Highly Interested</option>
-                      <option value="price-sensitive">Price Sensitive</option>
-                      <option value="urgent">Urgent Buyer</option>
-                      <option value="skeptical">Skeptical</option>
-                    </select>
-                  </div>
-                </div>
-
                 <div className="flex gap-2">
                   <Input
                     placeholder="Type your message..."
