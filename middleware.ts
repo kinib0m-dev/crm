@@ -15,10 +15,15 @@ export default auth((req) => {
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+
   // Add check for tRPC routes to be bypassed from authentication
   const isTrpcRoute = nextUrl.pathname.startsWith("/api/trpc");
 
-  if (isApiAuthRoute || isTrpcRoute) {
+  // Add check for webhook routes to bypass authentication
+  const isWebhook = nextUrl.pathname.startsWith("/api/webhooks");
+
+  // Skip middleware for API auth routes, tRPC routes, and webhooka
+  if (isApiAuthRoute || isTrpcRoute || isWebhook) {
     return;
   }
 
