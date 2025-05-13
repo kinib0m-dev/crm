@@ -30,7 +30,7 @@ export const botChatRouter = createTRPCRouter({
             conversationId: newConversation.id,
             role: "assistant",
             content:
-              "Hey there! This is Pedro from Carrera Cars. I've noticed you've filled out a form in one of our ads. What exactly are you interested in? ",
+              "¡Hola! Soy Pedro de Carrera Cars ¿Estás buscando algún vehículo en especial o solo estás viendo opciones? ",
           })
           .returning();
 
