@@ -49,7 +49,7 @@ export const carStockRouter = createTRPCRouter({
             type: input.type,
             description: input.description,
             price: input.price,
-            imageUrl: input.imageUrls,
+            imageUrl: input.imageUrl,
             url: input.url,
             notes: input.notes,
             embedding: embedding,

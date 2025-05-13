@@ -338,7 +338,7 @@ export const leadRouter = createTRPCRouter({
         const {
           status,
           priority,
-          sourceId,
+          campaignId,
           search,
           timeframe,
           page,
@@ -365,8 +365,11 @@ export const leadRouter = createTRPCRouter({
           queryConditions = and(queryConditions, eq(leads.priority, priority));
         }
 
-        if (sourceId) {
-          queryConditions = and(queryConditions, eq(leads.sourceId, sourceId));
+        if (campaignId) {
+          queryConditions = and(
+            queryConditions,
+            eq(leads.campaignId, campaignId)
+          );
         }
 
         if (timeframe) {
