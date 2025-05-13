@@ -35,11 +35,11 @@ type CarStockItemType = {
   type: string;
   description: string | null;
   price: string | null;
-  imageUrls: string[]; // Changed to array
+  imageUrl: string[] | null; // Changed to array
   url: string | null;
   notes: string | null;
   embedding: number[] | null;
-  isDeleted: boolean;
+  isDeleted: boolean | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -187,18 +187,18 @@ export function CarStockTable({
               className="hover:bg-muted/50 transition-colors"
             >
               <TableCell>
-                {car.imageUrls && car.imageUrls.length > 0 ? (
+                {car.imageUrl && car.imageUrl.length > 0 ? (
                   <div className="relative w-10 h-10 rounded-md overflow-hidden">
                     <Image
-                      src={car.imageUrls[0]} // Show the first image as thumbnail
+                      src={car.imageUrl[0]} // Show the first image as thumbnail
                       alt={car.name}
                       fill
                       className="object-cover"
                     />
-                    {car.imageUrls.length > 1 && (
+                    {car.imageUrl.length > 1 && (
                       <div className="absolute bottom-0 right-0 bg-black/70 text-white text-xs px-1 rounded-tl-md flex items-center">
                         <ImageIcon className="h-3 w-3 mr-0.5" />
-                        {car.imageUrls.length}
+                        {car.imageUrl.length}
                       </div>
                     )}
                   </div>

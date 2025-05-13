@@ -49,11 +49,11 @@ type CarStockItemType = {
   type: string;
   description: string | null;
   price: string | null;
-  imageUrls: string[]; // Changed to array
+  imageUrl: string[] | null;
   url: string | null;
   notes: string | null;
   embedding: number[] | null;
-  isDeleted: boolean;
+  isDeleted: boolean | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -126,17 +126,21 @@ export function CarStockDetailView({ carStock }: CarStockDetailViewProps) {
   };
 
   const nextImage = () => {
-    if (carStock.imageUrls.length <= 1) return;
-    setCurrentImageIndex((prev) =>
-      prev === carStock.imageUrls.length - 1 ? 0 : prev + 1
-    );
+    const images = carStock.imageUrl;
+    if (Array.isArray(images) && images.length > 1) {
+      setCurrentImageIndex((prev) =>
+        prev === images.length - 1 ? 0 : prev + 1
+      );
+    }
   };
 
   const prevImage = () => {
-    if (carStock.imageUrls.length <= 1) return;
-    setCurrentImageIndex((prev) =>
-      prev === 0 ? carStock.imageUrls.length - 1 : prev - 1
-    );
+    const images = carStock.imageUrl;
+    if (Array.isArray(images) && images.length > 1) {
+      setCurrentImageIndex((prev) =>
+        prev === 0 ? images.length - 1 : prev - 1
+      );
+    }
   };
 
   // Define a reusable InfoItem component for display
@@ -223,18 +227,18 @@ export function CarStockDetailView({ carStock }: CarStockDetailViewProps) {
       </div>
 
       {/* Car Images Carousel (if available) */}
-      {carStock.imageUrls && carStock.imageUrls.length > 0 ? (
+      {carStock.imageUrl && carStock.imageUrl.length > 0 ? (
         <Card className="overflow-hidden">
           <div className="relative h-80 w-full">
             <Image
-              src={carStock.imageUrls[currentImageIndex]}
+              src={carStock.imageUrl[currentImageIndex]}
               alt={`${carStock.name} - Image ${currentImageIndex + 1}`}
               fill
               className="object-contain"
             />
 
             {/* Navigation buttons */}
-            {carStock.imageUrls.length > 1 && (
+            {carStock.imageUrl.length > 1 && (
               <>
                 <Button
                   variant="ghost"
@@ -257,18 +261,18 @@ export function CarStockDetailView({ carStock }: CarStockDetailViewProps) {
           </div>
 
           {/* Image counter */}
-          {carStock.imageUrls.length > 1 && (
+          {carStock.imageUrl.length > 1 && (
             <div className="p-2 text-center text-sm text-muted-foreground">
               <div className="flex items-center justify-center gap-2">
                 <ImageIcon className="h-4 w-4" />
                 <span>
-                  {currentImageIndex + 1} of {carStock.imageUrls.length} images
+                  {currentImageIndex + 1} of {carStock.imageUrl.length} images
                 </span>
               </div>
 
               {/* Thumbnail indicators */}
               <div className="flex justify-center gap-1 mt-2">
-                {carStock.imageUrls.map((_, index) => (
+                {carStock.imageUrl.map((_, index) => (
                   <button
                     key={index}
                     className={`h-2 w-2 rounded-full ${

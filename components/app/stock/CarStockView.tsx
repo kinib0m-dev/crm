@@ -15,7 +15,7 @@ type CarStockItemType = {
   type: string;
   description: string | null;
   price: string | null;
-  imageUrl: string | null;
+  imageUrl: string[] | null;
   url: string | null;
   notes: string | null;
   embedding: number[] | null;

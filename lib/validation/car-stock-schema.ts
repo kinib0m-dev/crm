@@ -19,7 +19,7 @@ export const createCarStockSchema = z.object({
   ]),
   description: z.string().optional(),
   price: z.string().optional(),
-  imageUrls: z.array(z.string()),
+  imageUrl: z.array(z.string()),
   url: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -46,7 +46,7 @@ export const updateCarStockSchema = z.object({
   ]),
   description: z.string().optional(),
   price: z.string().optional(),
-  imageUrls: z.array(z.string()),
+  imageUrl: z.array(z.string()),
   url: z.string().optional(),
   notes: z.string().optional(),
 });

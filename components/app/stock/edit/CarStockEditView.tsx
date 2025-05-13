@@ -46,11 +46,11 @@ type CarStockItemType = {
   type: string;
   description: string | null;
   price: string | null;
-  imageUrls: string[]; // Changed to array
+  imageUrl: string[] | null;
   url: string | null;
   notes: string | null;
   embedding: number[] | null;
-  isDeleted: boolean;
+  isDeleted: boolean | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -67,7 +67,7 @@ export function CarStockEditView({ carStock }: CarStockEditViewProps) {
   const router = useRouter();
   const { updateCarStock, isLoading } = useUpdateCarStock();
   const [submitting, setSubmitting] = useState(false);
-  const [imageUrl, setImageUrl] = useState("");
+  const [urls, setUrls] = useState("");
 
   // Initialize form with car stock data
   const form = useForm<UpdateCarStockSchema>({
@@ -78,26 +78,26 @@ export function CarStockEditView({ carStock }: CarStockEditViewProps) {
       type: carStock.type as CarTypes,
       description: carStock.description || undefined,
       price: carStock.price || undefined,
-      imageUrls: carStock.imageUrls || [],
+      imageUrl: carStock.imageUrl || [],
       url: carStock.url || undefined,
       notes: carStock.notes || undefined,
     },
   });
 
-  const { imageUrls = [] } = form.watch();
+  const { imageUrl = [] } = form.watch();
 
   const addImageUrl = () => {
-    if (!imageUrl.trim()) return;
+    if (!urls.trim()) return;
 
     // Validate URL format
     try {
-      new URL(imageUrl);
-      const updatedImageUrls = [...imageUrls, imageUrl];
-      form.setValue("imageUrls", updatedImageUrls);
-      setImageUrl("");
+      new URL(urls);
+      const updatedImageUrls = [...imageUrl, urls];
+      form.setValue("imageUrl", updatedImageUrls);
+      setUrls("");
     } catch (e) {
       // Handle invalid URL format
-      form.setError("imageUrls", {
+      form.setError("imageUrl", {
         type: "manual",
         message: `Please enter a valid URL, ${e}`,
       });
@@ -105,9 +105,9 @@ export function CarStockEditView({ carStock }: CarStockEditViewProps) {
   };
 
   const removeImageUrl = (index: number) => {
-    const updatedImageUrls = [...imageUrls];
+    const updatedImageUrls = [...imageUrl];
     updatedImageUrls.splice(index, 1);
-    form.setValue("imageUrls", updatedImageUrls);
+    form.setValue("imageUrl", updatedImageUrls);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -259,7 +259,7 @@ export function CarStockEditView({ carStock }: CarStockEditViewProps) {
                 {/* Image URLs Field */}
                 <FormField
                   control={form.control}
-                  name="imageUrls"
+                  name="imageUrl"
                   render={() => (
                     <FormItem>
                       <FormLabel>Image URLs</FormLabel>
@@ -268,7 +268,7 @@ export function CarStockEditView({ carStock }: CarStockEditViewProps) {
                           <Input
                             placeholder="Enter image URL"
                             value={imageUrl}
-                            onChange={(e) => setImageUrl(e.target.value)}
+                            onChange={(e) => setUrls(e.target.value)}
                             onKeyDown={handleKeyPress}
                           />
                           <Button
@@ -284,11 +284,11 @@ export function CarStockEditView({ carStock }: CarStockEditViewProps) {
                         <FormMessage />
 
                         {/* Display added image URLs */}
-                        {imageUrls.length > 0 && (
+                        {imageUrl.length > 0 && (
                           <div className="space-y-2 mt-2">
                             <p className="text-sm font-medium">Car Images:</p>
                             <div className="space-y-2">
-                              {imageUrls.map((url, index) => (
+                              {imageUrl.map((url, index) => (
                                 <div
                                   key={index}
                                   className="flex items-center gap-2 p-2 rounded-md bg-muted/50 text-sm"

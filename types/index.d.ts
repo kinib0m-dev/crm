@@ -68,9 +68,8 @@ type LeadWithTags = {
   email: string | null;
   phone: string | null;
   status: LeadStatus;
-  sourceId: string | null;
+  campaignId: string | null;
   priority: number | null;
-  qualificationScore: number | null;
   lastContactedAt: Date | null;
   nextFollowUpDate: Date | null;
   expectedPurchaseTimeframe: Timeframe | null;

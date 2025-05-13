@@ -14,9 +14,8 @@ export const createLeadSchema = z.object({
     "venta_realizada",
     "no_cualificado",
   ]),
-  sourceId: z.string().uuid().optional(),
+  campaignId: z.string().uuid().optional(),
   priority: z.number().int().min(1).max(5).optional(),
-  qualificationScore: z.number().int().optional(),
   lastContactedAt: z.coerce.date().optional(),
   nextFollowUpDate: z.coerce.date().optional(),
   expectedPurchaseTimeframe: z
@@ -43,9 +42,8 @@ export const updateLeadSchema = z.object({
     "venta_realizada",
     "no_cualificado",
   ]),
-  sourceId: z.string().uuid().optional(),
+  campaignId: z.string().uuid().optional(),
   priority: z.number().int().min(1).max(5).optional(),
-  qualificationScore: z.number().int().optional(),
   lastContactedAt: z.coerce.date().optional(),
   nextFollowUpDate: z.coerce.date().optional(),
   expectedPurchaseTimeframe: z
@@ -71,7 +69,7 @@ export const filterLeadSchema = z.object({
     ])
     .optional(),
   priority: z.number().int().min(1).max(5).optional(),
-  sourceId: z.string().uuid().optional(),
+  campaignId: z.string().uuid().optional(),
   search: z.string().optional(),
   timeframe: z
     .enum(["immediate", "1-3 months", "3-6 months", "6+ months"])

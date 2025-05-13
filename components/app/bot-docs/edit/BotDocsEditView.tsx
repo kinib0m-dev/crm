@@ -47,7 +47,7 @@ type BotDocumentType = {
   category: string;
   content: string;
   fileName: string | null;
-  embedding: string | null;
+  embedding: number[] | null;
   createdAt: Date;
   updatedAt: Date;
 };

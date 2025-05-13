@@ -39,7 +39,7 @@ export function NewCarStockView() {
   const router = useRouter();
   const { createCarStock, isLoading } = useCreateCarStock();
   const [submitting, setSubmitting] = useState(false);
-  const [imageUrl, setImageUrl] = useState("");
+  const [urls, setUrls] = useState("");
 
   const form = useForm<CreateCarStockSchema>({
     resolver: zodResolver(createCarStockSchema),
@@ -48,26 +48,26 @@ export function NewCarStockView() {
       type: "sedan",
       description: "",
       price: "",
-      imageUrls: [],
+      imageUrl: [],
       url: "",
       notes: "",
     },
   });
 
-  const { imageUrls = [] } = form.watch();
+  const { imageUrl = [] } = form.watch();
 
   const addImageUrl = () => {
-    if (!imageUrl.trim()) return;
+    if (!urls.trim()) return;
 
     // Validate URL format
     try {
-      new URL(imageUrl);
-      const updatedImageUrls = [...imageUrls, imageUrl];
-      form.setValue("imageUrls", updatedImageUrls);
-      setImageUrl("");
+      new URL(urls);
+      const updatedImageUrls = [...imageUrl, urls];
+      form.setValue("imageUrl", updatedImageUrls);
+      setUrls("");
     } catch (e) {
       // Handle invalid URL format
-      form.setError("imageUrls", {
+      form.setError("imageUrl", {
         type: "manual",
         message: `Please enter a valid URL, ${e}`,
       });
@@ -75,9 +75,9 @@ export function NewCarStockView() {
   };
 
   const removeImageUrl = (index: number) => {
-    const updatedImageUrls = [...imageUrls];
+    const updatedImageUrls = [...imageUrl];
     updatedImageUrls.splice(index, 1);
-    form.setValue("imageUrls", updatedImageUrls);
+    form.setValue("imageUrl", updatedImageUrls);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -220,7 +220,7 @@ export function NewCarStockView() {
                   {/* Image URLs Field */}
                   <FormField
                     control={form.control}
-                    name="imageUrls"
+                    name="imageUrl"
                     render={() => (
                       <FormItem>
                         <FormLabel>Image URLs</FormLabel>
@@ -229,7 +229,7 @@ export function NewCarStockView() {
                             <Input
                               placeholder="Enter image URL"
                               value={imageUrl}
-                              onChange={(e) => setImageUrl(e.target.value)}
+                              onChange={(e) => setUrls(e.target.value)}
                               onKeyDown={handleKeyPress}
                             />
                             <Button
@@ -245,13 +245,13 @@ export function NewCarStockView() {
                           <FormMessage />
 
                           {/* Display added image URLs */}
-                          {imageUrls.length > 0 && (
+                          {imageUrl.length > 0 && (
                             <div className="space-y-2 mt-2">
                               <p className="text-sm font-medium">
                                 Added Images:
                               </p>
                               <div className="space-y-2">
-                                {imageUrls.map((url, index) => (
+                                {imageUrl.map((url, index) => (
                                   <div
                                     key={index}
                                     className="flex items-center gap-2 p-2 rounded-md bg-muted/50 text-sm"
