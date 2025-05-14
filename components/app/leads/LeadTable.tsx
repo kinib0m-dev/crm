@@ -137,6 +137,7 @@ export function LeadTable({
               </div>
             </TableHead>
             <TableHead>Contact</TableHead>
+            <TableHead>Campaign ID</TableHead>
             <TableHead
               onClick={() => handleSort("status")}
               className="cursor-pointer"
@@ -221,6 +222,7 @@ export function LeadTable({
                   )}
                 </div>
               </TableCell>
+              <TableCell>{lead.campaignId}</TableCell>
               <TableCell>
                 <Badge
                   className={`${getStatusColor(lead.status)} border-none font-normal`}

@@ -114,10 +114,11 @@ export function EmailTemplateTable({
         templateId: confirmSendTemplate.id,
         sendToAll: sendToAllLeads,
       });
-      setConfirmSendTemplate(null);
-      setSendToAllLeads(false);
     } catch (error) {
       console.error("Failed to send emails:", error);
+    } finally {
+      setConfirmSendTemplate(null);
+      setSendToAllLeads(false);
     }
   };
 
@@ -182,7 +183,7 @@ export function EmailTemplateTable({
       <Dialog
         open={!!confirmSendTemplate}
         onOpenChange={(open) => {
-          if (!open) {
+          if (!open && !isSending) {
             setConfirmSendTemplate(null);
             setSendToAllLeads(false);
           }
@@ -236,6 +237,7 @@ export function EmailTemplateTable({
                   onCheckedChange={(checked) =>
                     setSendToAllLeads(checked === true)
                   }
+                  disabled={isSending}
                 />
                 <div>
                   <label
@@ -257,8 +259,10 @@ export function EmailTemplateTable({
             <Button
               variant="outline"
               onClick={() => {
-                setConfirmSendTemplate(null);
-                setSendToAllLeads(false);
+                if (!isSending) {
+                  setConfirmSendTemplate(null);
+                  setSendToAllLeads(false);
+                }
               }}
               disabled={isSending}
             >
