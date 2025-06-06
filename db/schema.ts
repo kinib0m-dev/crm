@@ -175,18 +175,14 @@ export const organizations = pgTable("organizations", {
   description: text("description"), // Optional description
   color: organizationColorEnum("color").notNull().default("blue"), // Predefined colors
 
-  // SEO and metadata
-  metaTitle: text("meta_title"), // Custom meta title for internal pages
-  metaDescription: text("meta_description"), // Custom meta description
-
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// User-Organization memberships (many-to-many relationship)
-export const organizationMemberships = pgTable(
-  "organization_memberships",
+// User-Organization membersh (many-to-many relationship)
+export const organizationMembers = pgTable(
+  "organization_members",
   {
     id: uuid("id").notNull().defaultRandom().primaryKey(),
 
@@ -204,43 +200,12 @@ export const organizationMemberships = pgTable(
     joinedAt: timestamp("joined_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (membership) => [
+  (members) => [
     {
       // Ensure unique user-organization pairs
       compositePk: primaryKey({
-        columns: [membership.userId, membership.organizationId],
+        columns: [members.userId, members.organizationId],
       }),
     },
   ]
 );
-
-// Organization invitations
-export const organizationInvitations = pgTable("organization_invitations", {
-  id: uuid("id").notNull().defaultRandom().primaryKey(),
-
-  token: text("token").notNull().unique(), // Secure random token
-  email: text("email").notNull(), // Email to invite
-
-  organizationId: text("organization_id")
-    .notNull()
-    .references(() => organizations.id, { onDelete: "cascade" }),
-
-  role: organizationRoleEnum("role").notNull().default("member"), // Role to assign
-
-  // Who created the invitation
-  createdBy: text("created_by")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-
-  // Invitation status
-  isAccepted: boolean("is_accepted").default(false),
-  acceptedAt: timestamp("accepted_at", { mode: "date" }),
-  acceptedBy: text("accepted_by").references(() => users.id),
-
-  // Expiration
-  expiresAt: timestamp("expires_at", { mode: "date" }).notNull(),
-
-  // Timestamps
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
