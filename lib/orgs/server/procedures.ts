@@ -9,7 +9,7 @@ import {
 } from "../validation/orgs-schema";
 import { db } from "@/db";
 import { organizationMembers, organizations, users } from "@/db/schema";
-import { generateUniqueSlug } from "../utils/org-utils";
+import { generateUniqueSlug } from "../utils/server-org-utils";
 import { and, eq, desc, asc } from "drizzle-orm";
 
 export const orgsRouter = createTRPCRouter({
