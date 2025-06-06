@@ -6,6 +6,7 @@ import {
   integer,
   uuid,
   boolean,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
@@ -140,4 +141,106 @@ export const loginActivities = pgTable("login_activities", {
   userAgent: text("user_agent"),
   success: boolean("success").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ------------------------------------ ORGANISATIONS ------------------------------------
+// Organization role enum
+export const organizationRoleEnum = pgEnum("organization_role", [
+  "admin",
+  "member",
+]);
+
+// Predefined organization colors
+export const organizationColorEnum = pgEnum("organization_color", [
+  "blue",
+  "green",
+  "purple",
+  "red",
+  "orange",
+  "yellow",
+  "pink",
+  "teal",
+  "indigo",
+  "gray",
+]);
+
+// Organizations table
+export const organizations = pgTable("organizations", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(), // For clean URLs
+  description: text("description"), // Optional description
+  color: organizationColorEnum("color").notNull().default("blue"), // Predefined colors
+
+  // SEO and metadata
+  metaTitle: text("meta_title"), // Custom meta title for internal pages
+  metaDescription: text("meta_description"), // Custom meta description
+
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// User-Organization memberships (many-to-many relationship)
+export const organizationMemberships = pgTable(
+  "organization_memberships",
+  {
+    id: uuid("id").notNull().defaultRandom().primaryKey(),
+
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+
+    role: organizationRoleEnum("role").notNull().default("member"),
+
+    // Timestamps
+    joinedAt: timestamp("joined_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (membership) => [
+    {
+      // Ensure unique user-organization pairs
+      compositePk: primaryKey({
+        columns: [membership.userId, membership.organizationId],
+      }),
+    },
+  ]
+);
+
+// Organization invitations
+export const organizationInvitations = pgTable("organization_invitations", {
+  id: uuid("id").notNull().defaultRandom().primaryKey(),
+
+  token: text("token").notNull().unique(), // Secure random token
+  email: text("email").notNull(), // Email to invite
+
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+
+  role: organizationRoleEnum("role").notNull().default("member"), // Role to assign
+
+  // Who created the invitation
+  createdBy: text("created_by")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+
+  // Invitation status
+  isAccepted: boolean("is_accepted").default(false),
+  acceptedAt: timestamp("accepted_at", { mode: "date" }),
+  acceptedBy: text("accepted_by").references(() => users.id),
+
+  // Expiration
+  expiresAt: timestamp("expires_at", { mode: "date" }).notNull(),
+
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
