@@ -55,7 +55,7 @@ export const updateOrganizationSchema = z.object({
 });
 
 export type UpdateOrganizationSchema = z.infer<typeof updateOrganizationSchema>;
-// ------------------------------- ORGANIZATION MEMBERS -------------------------------
+
 // Organization members schemas
 export const updateMembersSchema = z.object({
   membersId: z.string().uuid(),
@@ -64,7 +64,7 @@ export const updateMembersSchema = z.object({
 
 export type UpdateMembersSchema = z.infer<typeof updateMembersSchema>;
 
-// Get organization members schema - simplified
+// Get organization members schema
 export const getOrganizationMembersSchema = z.object({
   organizationId: z.string().uuid(),
   sortBy: z.enum(["name", "email", "joinedAt", "role"]).default("name"),

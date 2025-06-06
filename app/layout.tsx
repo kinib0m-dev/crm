@@ -4,6 +4,7 @@ import "./globals.css";
 import { auth } from "@/auth";
 import { Toaster } from "sonner";
 import AuthProvider from "@/components/auth/AuthProvider";
+import { TRPCProvider } from "@/trpc/client";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -22,8 +23,8 @@ const sourceSans3 = Source_Sans_3({
 export const metadata: Metadata = {
   metadataBase: new URL("https://domain"),
   title: {
-    default: "Auth",
-    template: `%s | Auth`,
+    default: "CRM",
+    template: `%s | CRM`,
   },
   description: "Description",
   keywords: [],
@@ -31,11 +32,11 @@ export const metadata: Metadata = {
     icon: "/icon.png",
   },
   openGraph: {
-    title: "Auth",
+    title: "CRM",
     description: "Description",
     images: [""],
     url: "https://domain",
-    siteName: "Auth",
+    siteName: "CRM",
   },
 };
 
@@ -52,8 +53,10 @@ export default async function RootLayout({
         <body
           className={`${sora.variable} ${sourceSans3.variable} antialiased min-h-screen flex flex-col`}
         >
-          <main>{children}</main>
-          <Toaster richColors closeButton />
+          <TRPCProvider>
+            <main>{children}</main>
+            <Toaster richColors closeButton />
+          </TRPCProvider>
         </body>
       </html>
     </AuthProvider>
