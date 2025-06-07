@@ -39,8 +39,7 @@
     "sonner": "^2.0.5",
     "superjson": "^2.2.2",
     "tailwind-merge": "^3.3.0",
-    "zod": "^3.25.55",
-    "zustand": "^5.0.5"
+    "zod": "^3.25.55"
   },
   "devDependencies": {
     "@auth/drizzle-adapter": "^1.9.1",
